@@ -1,0 +1,27 @@
+version: '3'
+services:
+  bot:
+    build: .
+    command: python aio_bot_start.py
+    restart: always
+    environment:
+      - BOT_TOKEN=5583169793:AAEb6MF4fWkk-YGDIUAqGJrempMdGtc32M4
+#      - MONGO_PORT=27017
+    depends_on:
+      - db
+    networks:
+      - custom
+
+
+  db:
+    image: mongo
+    restart: always
+    volumes:
+      - ./data:/data/db
+    networks:
+      - custom
+
+
+networks:
+  custom:
+    driver: bridge
