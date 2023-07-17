@@ -56,7 +56,7 @@ def add_subscriber(user_id: int):
     :param user_id:
     :return:
     """
-    db = DB.db_obj.DbTgUsers(IP_ADRESS_MONGO_DB)
+    db = DB.db_obj.DbTgUsers()
     db.add_tg_subscriber(user_id)
     db.close()
 
@@ -65,7 +65,7 @@ def update_subscriber(user_id: int, field: str, status):
     """
     Обновление статуса поля подпиcчика
     """
-    db = DB.db_obj.DbTgUsers(IP_ADRESS_MONGO_DB)
+    db = DB.db_obj.DbTgUsers()
     db.update(user_id=user_id, key=field, value=status)
     db.close()
 
@@ -91,7 +91,6 @@ def update_user_subs(user_id: int, sport_class, user_sub: str):
         user = collection.find_one({"_id": user_id})
         old_user_sub = user["sub_stage_cat"]
     except TypeError:
-        print("Подписчик новый =)")
         add_subscriber(user_id)
         user = collection.find_one({"_id": user_id})
         old_user_sub = user["sub_stage_cat"]
