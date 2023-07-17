@@ -4,6 +4,7 @@ from unittest.mock import patch
 from DB.db_obj import DbTgUsers, DbStageResults
 from mongomock import MongoClient as MockMonkClient
 
+
 class Mock(DbTgUsers):
     def __init__(self):
         super().__init__()
@@ -11,12 +12,14 @@ class Mock(DbTgUsers):
         current_db = self.connection["test_db"]
         self.collection = current_db["test_collection"]
 
-class Mock_DbStage(DbStageResults):
+
+class MockDbStage(DbStageResults):
     def __init__(self):
         super().__init__()
         self.connection = MockMonkClient()
         current_db = self.connection["test_db"]
         self.collection = current_db["test_collection"]
+
 
 class TestDbTgUsers(unittest.TestCase):
     @classmethod
@@ -45,12 +48,11 @@ class TestDbTgUsers(unittest.TestCase):
         self.assertIsNone(subscriber)
 
 
-
 class TestDbStageResults(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         # cls.db = DbStageResults()
-        cls.db = Mock_DbStage()
+        cls.db = MockDbStage()
         cls.test_result = {
             "userId": 2,
             "userFullName": "2",
@@ -92,16 +94,16 @@ class TestDbStageResults(unittest.TestCase):
     def test_update(self):
         # Проверяем обновление существующего результата
         new_result = {
-                      "userId": 2,
-                      "userFullName": "20",
-                      "motorcycle": "30",
-                      "userCity": "city0",
-                      "userCountry": "country0",
-                      "athleteClass": "class0",
-                      "resultTimeSeconds": "resTime0",
-                      "resultTime": "time0",
-                      "fine": "fine0",  # пенальти
-                      "video": "href0"
+            "userId": 2,
+            "userFullName": "20",
+            "motorcycle": "30",
+            "userCity": "city0",
+            "userCountry": "country0",
+            "athleteClass": "class0",
+            "resultTimeSeconds": "resTime0",
+            "resultTime": "time0",
+            "fine": "fine0",  # пенальти
+            "video": "href0"
         }
         self.db.update(self.test_result, new_result)
         result = self.db.get(new_result["userId"])
@@ -113,11 +115,12 @@ class TestDbStageResults(unittest.TestCase):
     def tearDownClass(cls):
         cls.db.close()
 
+
 class TestDbStageBestTime(unittest.TestCase, DbStageResults):
-# Функция, которая будет создавать подключение к базе данных
+    # Функция, которая будет создавать подключение к базе данных
 
     def testGetTrueResult(self):
-        #arrange настраиваем класс, создаем тестовые данные
+        # arrange настраиваем класс, создаем тестовые данные
         client = MockMonkClient()
         db = client['ggp']
         self.collection = db["stage_40"]
@@ -125,9 +128,9 @@ class TestDbStageBestTime(unittest.TestCase, DbStageResults):
         self.collection.insert_one({"_id": "2", "resultTimeSeconds": 60, "userFullName": "Tester2"})
         self.collection.insert_one({"_id": "3", "resultTimeSeconds": 80, "userFullName": "Tester3"})
 
-        #act производим действие
+        # act производим действие
         test_col = self.get_bestStage_time()
-        #assert производим проверку
+        # assert производим проверку
         self.assertEqual(test_col, 60)
 
     def testGetTrueResult_None_Results(self):

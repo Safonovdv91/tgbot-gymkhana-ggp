@@ -32,4 +32,3 @@ btn3 = InlineKeyboardButton(text="🟠 ОТПИСАТЬСЯ от мировог�
 btn4 = InlineKeyboardButton(text="🟠 ОТПИСАТЬСЯ на регистрацию этапа", callback_data='fx4')
 
 btnSubscribeNews.add(btn1, btn2)
-

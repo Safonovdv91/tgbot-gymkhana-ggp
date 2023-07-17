@@ -11,7 +11,6 @@ import get_info_api
 from aio_bot import aio_bot_functions
 
 
-
 API_bot = config_bot.config['API_token']
 admin_id = config_bot.config['admin_id']
 
@@ -33,15 +32,21 @@ dp = Dispatcher(bot)
 # Инициализация меню по нажатию страрт
 @dp.message_handler(commands=['start'])
 async def start_bot(message: types.Message):
-    text = "Олоха мой джимхо друг, я бот создаyный немного помочь тебе в мотоджимхане не будем затягивать вот что я умею: \n" \
+    text = "Олоха мой джимхо друг, я бот создаyный немного помочь тебе в мотоджимхане не будем " \
+           "затягивать вот что я умею: \n" \
            "'✒Подписаться' - здесь ты можешь подписаться на результаты спортсменов " \
-           "катающих этап GGP 2023. Просто нажимай 'Подписаться' и выбирай классы которые тебя интересуют, как только "\
+           "катающих этап GGP 2023. Просто нажимай 'Подписаться' и выбирай классы которые" \
+           " тебя интересуют, как только "\
            "их результат выложат - я пришлю тебе уведомление. \n " \
-           "Получить 🗺 этапа' - тут ты можешь получить текущий этап GGP 2023, если вдруг забыл куда ехать - нажимай и учи. \n" \
-           " 'Получить 🕗 этапа' - считай калькулятор - динамически обновляется как только спортсмены улучшат результат," \
+           "Получить 🗺 этапа' - тут ты можешь получить текущий этап GGP 2023, если вдруг забыл куда ехать" \
+           " - нажимай и учи. \n" \
+           " 'Получить 🕗 этапа' - считай калькулятор - динамически обновляется как только спортсмены" \
+           " улучшат результат," \
            " что бы ты мог понимать на какой уровень катаешь.\n\n" \
-           "🧮 А ещё ты можешь мне прислать время в формате mm:ss.ms или ss.ms и получишь быстрый расчёт рейтинга."
+           "🧮 А ещё ты можешь мне прислать время в формате mm:ss.ms или ss.ms и " \
+           "получишь быстрый расчёт рейтинга."
     await bot.send_message(message.from_user.id, text, reply_markup=nav.mainMenu)
+
 
 @dp.message_handler(commands=["help"])
 async def help_bot(message: types.Message):
@@ -59,13 +64,17 @@ async def help_bot(message: types.Message):
            "🧮 А ещё ты можешь мне прислать время в формате mm:ss.ms или ss.ms и получишь быстрый расчёт рейтинга."
     await message.answer(text)
 
+
 @dp.message_handler(commands=["unsub"])
 async def unsubscribe_bot(message: types.Message):
-    '''Удаляем все подписки у пользователя'''
+    """Удаляем все подписки у пользователя"""
     pass
+
 
 @dp.message_handler()
 async def subscribe_results(message: types.Message):
+    """ Анализ сообщения для подписки
+    """
     if message.text == "Подписаться":
         await bot.send_message(message.from_user.id, "Выбери на какой класс подписаться",
                                reply_markup=nav.subscribeMenu)
@@ -115,7 +124,7 @@ async def subscribe_results(message: types.Message):
             best_time_ms = aio_bot_functions.BotFunction().convert_to_milliseconds(message.text)
             if best_time_ms > 0:
                 text = aio_bot_functions.BotFunction().make_calculate_text(best_time_ms)
-                mmssms = aio_bot_functions.BotFunction().milliseconds_to_mmssms(best_time_ms)
+                mmssms = aio_bot_functions.BotFunction().msec_to_mmssms(best_time_ms)
                 text = f"Для времени: {mmssms} \n{text}"
                 await message.answer(text, reply_markup=nav.mainMenu)
             else:
@@ -129,7 +138,7 @@ async def subscribe_results(message: types.Message):
 
 #
 # --- Периодическое обновление участников этапа ---
-async def scheduled(wait_for):
+async def scheduled():
     """ запланированная периодическая задача отвечающая за сравнение и разсылку новых результатов
     """
     while True:
@@ -137,7 +146,7 @@ async def scheduled(wait_for):
             print("_", end='')
             await asyncio.sleep(config_bot.config_gymchana_cup["GET_TIME_OUT"])
             data_dic = get_info_api.get_sportsmans_from_ggp_stage()
-            if data_dic == False:
+            if not data_dic:
                 return False
             get_results_from_stage = data_dic["results"]
             for each in get_results_from_stage:
@@ -173,7 +182,7 @@ async def scheduled(wait_for):
 # Запускаем лонг поллинг
 def main():
     loop = asyncio.get_event_loop()
-    loop.create_task(scheduled(5))
+    loop.create_task(scheduled())
     executor.start_polling(dp, skip_updates=True)
 
 if __name__ == "__main__":

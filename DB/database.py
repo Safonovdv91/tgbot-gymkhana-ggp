@@ -41,11 +41,11 @@ def update_stage_result(stage_id: int, result) -> bool:
     return True
 
 
-def find_one_sportsman_from_stage(stage_id: int, userId: int):
+def find_one_sportsman_from_stage(stage_id: int, user_id: int):
     """Получениеданных спортсмена из этапа"""
     db_client = MongoClient(IP_ADRESS_MONGO_DB, 27017)
     current_db = db_client["ggp"]
-    collection = current_db[f"stage_{stage_id}"].find_one({"_id": userId})
+    collection = current_db[f"stage_{stage_id}"].find_one({"_id": user_id})
     db_client.close()
     return collection
 
@@ -68,12 +68,6 @@ def update_subscriber(user_id: int, field: str, status):
     db = DB.db_obj.DbTgUsers()
     db.update(user_id=user_id, key=field, value=status)
     db.close()
-
-    # db_client = MongoClient(IP_ADRESS_MONGO_DB, 27017)
-    # curent_db = db_client["users_bot"]
-    # collection = curent_db["users"]
-    # collection.update_one({"_id": user_id}, {"$set": {field: status}})
-    # db_client.close()
 
 
 def update_user_subs(user_id: int, sport_class, user_sub: str):
@@ -121,50 +115,42 @@ def get_subscribers():
     db_client.close()
 
 
-def append_idtg_to_subs(user_tg_id: int, authleteClass: str):
+def append_idtg_to_subs(user_tg_id: int, authlete_class: str):
     db_client = MongoClient(IP_ADRESS_MONGO_DB, 27017)
     current_db = db_client["users_bot"]
     collection = current_db["subs_class"]
-    subs_ls = collection.find_one({"_id": authleteClass})
+    subs_ls = collection.find_one({"_id": authlete_class})
     print(f"subs_ls - {subs_ls}")
     if subs_ls is None:
-        collection.insert_one({"_id": authleteClass, "id_tg_users": [user_tg_id]})
+        collection.insert_one({"_id": authlete_class, "id_tg_users": [user_tg_id]})
     else:
         subs_ls["id_tg_users"].append(user_tg_id)
-        collection.update_one({"_id": authleteClass}, {"$set": {"id_tg_users": subs_ls["id_tg_users"]}})
+        collection.update_one({"_id": authlete_class}, {"$set": {"id_tg_users": subs_ls["id_tg_users"]}})
     db_client.close()
 
 
-def del_idtg_from_subs(user_tg_id: int, authleteClass: str):
+def del_idtg_from_subs(user_tg_id: int, authlete_class: str):
     db_client = MongoClient(IP_ADRESS_MONGO_DB, 27017)
     current_db = db_client["users_bot"]
     collection = current_db["subs_class"]
-    subs_ls = collection.find_one({"_id": authleteClass})
+    subs_ls = collection.find_one({"_id": authlete_class})
     print(f"subs_ls - {subs_ls}")
     subs_ls["id_tg_users"].remove(user_tg_id)
-    collection.update_one({"_id": authleteClass}, {"$set": {"id_tg_users": subs_ls["id_tg_users"]}})
+    collection.update_one({"_id": authlete_class}, {"$set": {"id_tg_users": subs_ls["id_tg_users"]}})
     db_client.close()
 
 
-def get_tg_subs(authleteClass: str):
+def get_tg_subs(authlete_class: str):
     db_client = MongoClient(IP_ADRESS_MONGO_DB, 27017)
     current_db = db_client["users_bot"]
     collection = current_db["subs_class"]
-    subs_ls = collection.find_one({"_id": authleteClass})
-    if subs_ls == None:
+    subs_ls = collection.find_one({"_id": authlete_class})
+    if subs_ls is None:
         print("NOOONE")
-    subs_ls = collection.find_one({"_id": authleteClass})["id_tg_users"]
+    subs_ls = collection.find_one({"_id": authlete_class})["id_tg_users"]
     db_client.close()
     return subs_ls
 
 
 if __name__ == "__main__":
     pass
-    # add_subscriber(156546)
-    # get_from_stage()
-    # update_user_subs(1888, "sdd", "C1")
-    # append_idtg_to_subs(53, "N")
-    # del_idtg_from_subs(53, "N")
-    # print(get_tg_subs("C2"))
-    # add_stage_result(30, {"_id": 2, "name": "test"})
-    # update_stage_result(30, {"_id": 2, "name": "test2"})

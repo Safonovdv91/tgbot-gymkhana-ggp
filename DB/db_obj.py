@@ -56,6 +56,7 @@ class DbTgUsers(DbMongo):
 
 class DbStageResults(DbMongo):
     DB_NAME = "ggp"
+
     def __init__(self):
 
         super().__init__()
@@ -93,8 +94,8 @@ class DbStageResults(DbMongo):
         self.collection.delete_one({"_id": id_result})
         return True
 
-    def get(self, userId: int):
-        return self.collection.find_one({"_id": userId})
+    def get(self, user_id: int):
+        return self.collection.find_one({"_id": user_id})
 
     def update(self, result: dict, new_result: dict):
         """
