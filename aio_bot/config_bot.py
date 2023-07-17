@@ -1,6 +1,6 @@
 config = {
     "name": "GymkhanaBot",
-    "API_token": "YOUR TOKEN FROM BOTFATHER",
+    "API_token": "-----",
     "admin_id": "YOUR ADMIN TG ID",
     "ip_mongo_database": "172.17.0.2",
     "port_mongo_database": 27017
@@ -8,7 +8,7 @@ config = {
 
 config_gymchana_cup = {
     "site": "https://api.mg-cup.ru/",
-    "API": "YOUR API FROM SERVICE mg-cup",
+    "API": "------",
     "GET_TIME_OUT": 5,
     "id_stage_now": 30,
     "trackUrl": "Сейчас межсезонье, этап не катают",
