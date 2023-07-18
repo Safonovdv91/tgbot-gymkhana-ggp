@@ -126,9 +126,9 @@ def main():
         "userCity": "city",
         "userCountry": "country",
         "athleteClass": "class",
-        "resultTimeSeconds": "resTime",
+        "resultTimeSeconds": 100000,
         "resultTime": "time",
-        "fine": "fine",  # пенальти
+        "fine": 1,  # пенальти
         "video": "href"
     }
     res2 = {
@@ -138,9 +138,9 @@ def main():
         "userCity": "city0",
         "userCountry": "country0",
         "athleteClass": "class0",
-        "resultTimeSeconds": "resTime0",
+        "resultTimeSeconds": 11111,
         "resultTime": "time0",
-        "fine": "fine0",  # пенальти
+        "fine": 10,  # пенальти
         "video": "href0"
     }
     assert db_test.add(res1), "Добавление успешно"
