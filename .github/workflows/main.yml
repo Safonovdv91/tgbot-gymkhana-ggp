@@ -2,8 +2,10 @@ name: Run_Tests_On_Push
 
 on: 
   push:
-    branches:
+    branches: 
       - main
+      - dev-tests
+      
 
 jobs:
   test:
@@ -23,3 +25,5 @@ jobs:
 
     - name: Run tests
       run: pytest
+      
+      
