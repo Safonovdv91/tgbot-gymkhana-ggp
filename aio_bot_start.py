@@ -110,11 +110,10 @@ async def subscribe_results(message: types.Message):
 
     elif message.text == "Получить 🕗 этапа":
         b_result = DbStageResults().get_bestStage_time()
-
-        text = aio_bot_functions.BotFunction().make_calculate_text(b_result)
         if b_result is None:
             await message.answer("На данный момент ещё нет ни одного результата")
         else:
+            text = aio_bot_functions.BotFunction().make_calculate_text(b_result)
             await message.answer(text)
 
     elif message.text == "Подписаться news":
@@ -151,14 +150,14 @@ async def scheduled():
             get_results_from_stage = data_dic["results"]
             for each in get_results_from_stage:
                 msg_text = False
-                db_sportsman = DBM.find_one_sportsman_from_stage(config_bot.config_gymchana_cup["id_stage_now"], each["userId"])
+                db_sportsman = DBM.find_one_sportsman_from_stage(config_bot.config_gymchana_cup["id_stage_now"],
+                                                                 each["userId"])
                 if db_sportsman is None:
                     msg_text = f"{each['athleteClass']}: {each['userFullName']} - {each['resultTime']}\n{each['video']}"
                     msg_text = f"⚡ Новый результат\n{msg_text}"
 
-                    # Добавляем новый результат спортсмена
-                    print(f"Результат добавления: "
-                          f"{DBM.add_stage_result(config_bot.config_gymchana_cup['id_stage_now'], each)}")
+                    # Добавляем новый результат спортсмена в базу данных
+                    DBM.add_stage_result(config_bot.config_gymchana_cup['id_stage_now'], each)
 
                 else:
                     if each["resultTimeSeconds"] < db_sportsman["resultTimeSeconds"]:
@@ -166,9 +165,9 @@ async def scheduled():
                                    f"было: [{db_sportsman['resultTime']}] \n {each['video']} "
                         msg_text = f"💥 Улучшил время\n {msg_text}"
 
-                        # Обновляем новый результат спортсмена
-                        print(f"Результат обновления: "
-                              f"{DBM.update_stage_result(config_bot.config_gymchana_cup['id_stage_now'], each)}")
+                        # Обновляем новый результат спортсмена в базе данных
+                        DBM.update_stage_result(config_bot.config_gymchana_cup['id_stage_now'], each)
+
                 # Разсылаем сообщения
                 if msg_text:
                     tg_clients = DBM.get_tg_subs(each["athleteClass"])
@@ -177,7 +176,7 @@ async def scheduled():
 
         except Exception as e:
             print(e)
-            await bot.send_message(189085044, f"Exception")
+            await bot.send_message(admin_id, f"Exception{e}")
 
 # Запускаем лонг поллинг
 def main():
