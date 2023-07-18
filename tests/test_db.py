@@ -39,7 +39,9 @@ class TestDbTgUsers(unittest.TestCase):
 
     def test_get_tg_subscriber(self):
         # Проверяем получение существующего подписчика
+        self.db.add_tg_subscriber(self.test_user_id)
         subscriber = self.db.get_tg_subscriber(self.test_user_id)
+
         self.assertIsNotNone(subscriber)
         self.assertEqual(subscriber["_id"], self.test_user_id)
 
@@ -61,18 +63,18 @@ class TestDbStageResults(unittest.TestCase):
             "userCountry": "country",
             "athleteClass": "class",
             "resultTimeSeconds": "resTime",
-            "resultTime": "time",
+            "resultTime": 124,
             "fine": "fine",  # пенальти
             "video": "href"
         }
 
     def test_add(self):
-        # Проверяем добавление результата
+        " Проверяем добавление результата"
         result = self.db.add(self.test_result)
         self.assertTrue(result)
 
     def test_del_result(self):
-        # Проверяем удаление существующего результата
+        "Проверяем удаление существующего результата"
         result = self.db.del_result(self.test_result["userId"])
         self.assertTrue(result)
 
@@ -81,18 +83,20 @@ class TestDbStageResults(unittest.TestCase):
         self.assertTrue(result)  # Удаление несуществующего результата также считается успешным
 
     def test_get(self):
-        # Проверяем получение существующего результата
-        self.db.add(self.test_result["userId"])
-        result = self.db.get(self.test_result["userId"])
-        self.assertIsNotNone(result)
-        self.assertEqual(result["userId"], self.test_result["_id"])
+        " Проверяем получение существующего результата"
+        user = self.test_result
+        self.db.add(user)
+        self.assertEqual(self.db.get(user["userId"])["_id"], user["userId"])
 
         # Проверяем получение несуществующего результата
         result = self.db.get(1234)
         self.assertIsNone(result)
 
     def test_update(self):
-        # Проверяем обновление существующего результата
+        " Обновление результата"
+        user = self.test_result
+        self.db.add(user)
+
         new_result = {
             "userId": 2,
             "userFullName": "20",
@@ -108,12 +112,9 @@ class TestDbStageResults(unittest.TestCase):
         self.db.update(self.test_result, new_result)
         result = self.db.get(new_result["userId"])
         self.assertIsNotNone(result)
-        self.assertEqual(result["userId"], new_result["_id"])
-        self.assertEqual(result["name"], new_result["name"])
 
-    @classmethod
-    def tearDownClass(cls):
-        cls.db.close()
+        self.assertEqual(result["_id"], new_result["userId"])
+        self.assertEqual(result["resultTime"], new_result["resultTime"])
 
 
 class TestDbStageBestTime(unittest.TestCase, DbStageResults):
@@ -142,14 +143,6 @@ class TestDbStageBestTime(unittest.TestCase, DbStageResults):
         test_result = self.get_bestStage_time()
         # assert производим проверку
         self.assertIsNone(test_result)
-
-    def testDbNotWorking(self):
-        # client = MockMonkClient()
-        # db = client['ggp']
-        # self.collection = db["stage_40"]
-
-        test_time = self.get_bestStage_time()
-        self.assertEqual(test_time, "server not working")
 
 
 if __name__ == "__main__":

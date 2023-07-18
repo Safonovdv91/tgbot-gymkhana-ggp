@@ -2,10 +2,8 @@ import os
 import sys
 import unittest
 
-from aio_bot.aio_bot_functions import *
-
 sys.path.append(os.getcwd())
-print(os.getcwd())
+from aio_bot.aio_bot_functions import BotFunction
 
 
 class TestBotFunctionsSpendBestTime(unittest.TestCase):
