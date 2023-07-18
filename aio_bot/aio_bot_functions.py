@@ -29,7 +29,7 @@ class BotFunction:
         return int(seconds * 1_000) + minutes * 60_000
 
     @staticmethod
-    def msec_to_mmssms(milliseconds):
+    def msec_to_mmssms(milliseconds: int):
         """ Проверка milliseconds на верный вход данных
         """
         try:
@@ -46,7 +46,7 @@ class BotFunction:
         mmssms_format: str = "{:02d}:{:02d}.{:03d}".format(minutes, seconds, milliseconds)
         return mmssms_format
 
-    def make_calculate_text(self, best_time_ms):
+    def make_calculate_text(self, best_time_ms: (int, float)):
         """ Генерируем исходящее сообщение
         """
         text = f'🟦 🇧: {self.msec_to_mmssms(best_time_ms)} - {self.msec_to_mmssms(best_time_ms * 1.05 - 1)} \n' \
