@@ -104,9 +104,9 @@ class TestDbStageResults(unittest.TestCase):
             "userCity": "city0",
             "userCountry": "country0",
             "athleteClass": "class0",
-            "resultTimeSeconds": "resTime0",
+            "resultTimeSeconds": 500000,
             "resultTime": "time0",
-            "fine": "fine0",  # пенальти
+            "fine": 10,  # пенальти
             "video": "href0"
         }
         self.db.update(self.test_result, new_result)
@@ -136,9 +136,9 @@ class TestDbStageBestTime(unittest.TestCase, DbStageResults):
 
     def testGetTrueResult_None_Results(self):
         # arrange настраиваем класс, создаем тестовые данные
-        client = MockMonkClient()
-        db = client['ggp']
-        self.collection = db["stage_40"]
+        # client = MockMonkClient()
+        # db = client['ggp']
+        # self.collection = db["stage_40"]
         # act проводим проверку
         test_result = self.get_bestStage_time()
         # assert производим проверку
