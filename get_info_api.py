@@ -17,12 +17,14 @@ def get_sportsmans_from_ggp_stage(site=SITE, api_gymkhana=API_GYMKHANA):
     get_api = requests.get(f"{site}championships/list?signature={api_gymkhana}&types=gp&fromYear={datetime.now().year}"
                            f"&toYear={datetime.now().year}")
     championship_id = get_api.json()[0]["id"]
+
     # взяв ID действующего чемпионата получаем его этапы и после проходим по ним пока не найдем действующий
     get_api = requests.get(f"{site}/championships/get?signature={api_gymkhana}&id={championship_id}&type=gp")
     stages = get_api.json()["stages"]
+
     for stage in stages:
         # поиск действующего этапа, если его нет - значит этап не идет
-        if stage["status"] == "Приём результатов":
+        if stage["status"] in ("Приём результатов", "Подведение итогов"):
             now_stage = stage
             get_api = requests.get(f"{site}/stages/get?signature={api_gymkhana}&id={now_stage['id']}&type=gp")
             # выставляем более частую проверку и выставляем id этапа ! ПОТОМ ВЫНЕСТИ В ДРУГУЮ ФУНКЦИЮ
@@ -35,7 +37,6 @@ def get_sportsmans_from_ggp_stage(site=SITE, api_gymkhana=API_GYMKHANA):
     print("Сейчас нет приема результатов, устанавливаем повышенный таймаут")
     config_bot.config_gymchana_cup["GET_TIME_OUT"] = 3600*5
     config_bot.config_gymchana_cup["trackUrl"] = False
-
     return False
 
 
