@@ -21,8 +21,9 @@ admin_id = config_bot.config['admin_id']
 # MONGO_DB = os.environ.get("MONGO_DB")
 
 
-# задаем уровень логов
-logging.basicConfig(level=logging.INFO)
+# задаем логирование
+logging.basicConfig(level=logging.INFO, filename="aio_bot/logs/bot_log.log",
+                    filemode="w", format="%(asctime)s %(levelname)s %(message)s")
 
 # инициализируем бота
 bot = Bot(token=API_bot, parse_mode=types.ParseMode.HTML)
@@ -103,6 +104,8 @@ async def subscribe_results(message: types.Message):
             else:
                 await bot.send_message(message.from_user.id, " Сейчас межсезонье мэн, покатай базовую фигуру")
         except Exception as e:
+            logging.exception("def subscribe result")
+            logging.exception(e)
             print(f"Поймано исключение при отправке карты этапа {message.from_user.id} : -", e)
             await message.answer("Бро, что-то пошло не так 8'(- скорее всего сервак лежит, запроси карту попозже...")
             await bot.send_message(admin_id, f'❗ Поймано исключение при отправке карты этапа от {message.from_user.id}:'
@@ -117,7 +120,8 @@ async def subscribe_results(message: types.Message):
             await message.answer(text)
 
     elif message.text == "Подписаться news":
-        await bot.send_message(message.from_user.id, "функция находится в разработке, надо немного подождать", reply_markup=nav.mainMenu)
+        await bot.send_message(message.from_user.id, "функция находится в разработке, надо немного подождать",
+                               reply_markup=nav.mainMenu)
     else:
         try:
             best_time_ms = aio_bot_functions.BotFunction().convert_to_milliseconds(message.text)
@@ -127,18 +131,21 @@ async def subscribe_results(message: types.Message):
                 text = f"Для времени: {mmssms} \n{text}"
                 await message.answer(text, reply_markup=nav.mainMenu)
             else:
-                await message.answer('Братишка, не надо просто так писать, воспользуйся встроенным меню ;)↘ или напиши /help',
+                await message.answer('Братишка, не надо просто так писать,'
+                                     ' воспользуйся встроенным меню ;)↘ или напиши /help',
                                      reply_markup=nav.mainMenu)
         except Exception as e:
             print(e)
-            await message.answer('Братишка, не надо просто так писать, воспользуйся встроенным меню ;)↘ или напиши /help',
+            logging.error(e)
+            await message.answer('Братишка, не надо просто так писать,'
+                                 ' воспользуйся встроенным меню ;)↘ или напиши /help',
                                  reply_markup=nav.mainMenu)
 
 
 #
 # --- Периодическое обновление участников этапа ---
 async def scheduled():
-    """ запланированная периодическая задача отвечающая за сравнение и разсылку новых результатов
+    """ Запланированная периодическая задача отвечающая за сравнение и разсылку новых результатов
     """
     while True:
         try:
@@ -175,7 +182,8 @@ async def scheduled():
                         await bot.send_message(tg_client, msg_text, disable_notification=True)
 
         except Exception as e:
-            print(e)
+            logging.exception("aio_bot_start")
+            logging.exception(e)
             await bot.send_message(admin_id, f"Exception{e}")
 
 # Запускаем лонг поллинг
@@ -183,6 +191,7 @@ def main():
     loop = asyncio.get_event_loop()
     loop.create_task(scheduled())
     executor.start_polling(dp, skip_updates=True)
+
 
 if __name__ == "__main__":
     main()
