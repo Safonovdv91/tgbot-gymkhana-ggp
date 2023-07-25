@@ -113,7 +113,7 @@ class StageSportsmanResult:
     def result_time_seconds(self, value: int):
         if not isinstance(value, int):
             raise TypeError("Result Time must be Integer")
-        if value <= 0:
+        if value < 0:
             raise AttributeError(f"Result must be positive value")
         self._result_time_seconds = value
 
