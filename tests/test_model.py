@@ -134,6 +134,11 @@ class TestStageSubscribers(unittest.TestCase):
         test_stage.add_subscriber(1111)
         self.assertEqual(test_stage.subscribers_id, {12345, 1111, 1112})
 
+    def test_add_new_subscriber_LongId(self):
+        test_stage = StageSubscribers("C1", {12345123451234512345})
+        test_stage.add_subscriber(11122222222414124152412312312312512)
+        self.assertEqual(test_stage.subscribers_id, {12345123451234512345, 11122222222414124152412312312312512})
+
     def test_remove_subscriber(self):
         test_stage = StageSubscribers("C1", {12345})
         test_stage.add_subscriber(1111)
