@@ -1,7 +1,8 @@
 import random
 import unittest
 from unittest.mock import patch
-from DB.db_obj import DbTgUsers, DbStageResults
+from DB.models import StageSportsmanResult
+from DB.db_obj import DbTgUsers, DbStageResults, DbSubsAtheleteClass
 from mongomock import MongoClient as MockMonkClient
 
 
@@ -64,13 +65,15 @@ class TestDbStageResults(unittest.TestCase):
             "athleteClass": "class",
             "resultTimeSeconds": "resTime",
             "resultTime": 124,
-            "fine": "fine",  # пенальти
+            "fine": 0,  # пенальти
             "video": "href"
         }
+        cls.sportsman_result = StageSportsmanResult(123, "name", "moto", "city", "count", "C1", 556, "1244", 21,
+                                                    "video")
 
     def test_add(self):
         " Проверяем добавление результата"
-        result = self.db.add(self.test_result)
+        result = self.db.add(self.sportsman_result)
         self.assertTrue(result)
 
     def test_del_result(self):
@@ -83,10 +86,20 @@ class TestDbStageResults(unittest.TestCase):
         self.assertTrue(result)  # Удаление несуществующего результата также считается успешным
 
     def test_get(self):
-        " Проверяем получение существующего результата"
-        user = self.test_result
+        "Проверяем получение существующего результата"
+        user = self.sportsman_result
         self.db.add(user)
-        self.assertEqual(self.db.get(user["userId"])["_id"], user["userId"])
+        fx = user.sportsman_id
+        self.assertEqual(self.db.get(fx), {'_id': 123,
+                                           'athleteClass': 'C1',
+                                           'fine': 21,
+                                           'motorcycle': 'moto',
+                                           'resultTime': '1244',
+                                           'resultTimeSeconds': 556,
+                                           'userCity': 'city',
+                                           'userCountry': 'count',
+                                           'userFullName': 'name',
+                                           'video': 'video'})
 
         # Проверяем получение несуществующего результата
         result = self.db.get(1234)
@@ -94,9 +107,9 @@ class TestDbStageResults(unittest.TestCase):
 
     def test_update(self):
         " Обновление результата"
-        user = self.test_result
-        self.db.add(user)
+        user = self.sportsman_result
 
+        self.db.add(user)
         new_result = {
             "userId": 2,
             "userFullName": "20",
@@ -109,6 +122,7 @@ class TestDbStageResults(unittest.TestCase):
             "fine": 10,  # пенальти
             "video": "href0"
         }
+
         self.db.update(self.test_result, new_result)
         result = self.db.get(new_result["userId"])
         self.assertIsNotNone(result)
@@ -135,14 +149,27 @@ class TestDbStageBestTime(unittest.TestCase, DbStageResults):
         self.assertEqual(test_col, 60)
 
     def testGetTrueResult_None_Results(self):
-        # arrange настраиваем класс, создаем тестовые данные
-        # client = MockMonkClient()
-        # db = client['ggp']
-        # self.collection = db["stage_40"]
         # act проводим проверку
         test_result = self.get_bestStage_time()
         # assert производим проверку
         self.assertIsNone(test_result)
+
+
+class TestDbSubsClass(unittest.TestCase, DbSubsAtheleteClass):
+    def test_get_subscriber(self):
+        client = DbSubsAtheleteClass()
+        self.assertEqual(client.get_subscriber("B"), [189085044])
+
+    def test_get_subscriber_empty_list(self):
+        client = DbSubsAtheleteClass()
+        self.assertEqual(client.get_subscriber("D4"), [])
+
+    def test_get_subscriber_unknown_athelete_class(self):
+        client = DbSubsAtheleteClass()
+        with self.assertRaises(AttributeError):
+            client.get_subscriber("66")
+
+
 
 
 if __name__ == "__main__":

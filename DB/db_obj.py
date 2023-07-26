@@ -1,6 +1,7 @@
 from pymongo import MongoClient
 from pymongo import errors
 from aio_bot import config_bot
+from DB.models import StageSportsmanResult
 
 
 class DbMongo:
@@ -46,8 +47,7 @@ class DbTgUsers(DbMongo):
         return self.collection.find_one({"_id": tg_user_id})
 
     def update(self, user_id, key: str, value: str):
-        """
-        Обновление статуса подписчика
+        """ Обновление статуса подписчика
         """
         if self.get_tg_subscriber(user_id) is None:
             return False
@@ -63,25 +63,25 @@ class DbStageResults(DbMongo):
         self.current_db = self.connection[self.DB_NAME]
         self.collection = self.current_db[f"stage_{config_bot.config_gymchana_cup['id_stage_now']}"]
 
-    def add(self, result):
+    def add(self, result: StageSportsmanResult):
         """
         функция добалвения  новгого результата
         :param result:
         :return:
         """
-        if self.collection.find_one({"_id": result["userId"]}):
+        if self.collection.find_one({"_id": result.sportsman_id}):
             return False
         self.collection.insert_one({
-            "_id": result["userId"],
-            "userFullName": result["userFullName"],
-            "motorcycle": result["motorcycle"],
-            "userCity": result["userCity"],
-            "userCountry": result["userCountry"],
-            "athleteClass": result["athleteClass"],
-            "resultTimeSeconds": result["resultTimeSeconds"],
-            "resultTime": result["resultTime"],
-            "fine": result["fine"],  # пенальти
-            "video": result["video"]
+            "_id": result.sportsman_id,
+            "userFullName": result.user_full_name,
+            "motorcycle": result.motorcycle,
+            "userCity": result.user_city,
+            "userCountry": result.user_country,
+            "athleteClass": result.athlete_class,
+            "resultTimeSeconds": result.result_time_seconds,
+            "resultTime": result.result_time,
+            "fine": result.fine,  # пенальти
+            "video": result.video
         })
         return True
 
@@ -97,7 +97,7 @@ class DbStageResults(DbMongo):
     def get(self, user_id: int):
         return self.collection.find_one({"_id": user_id})
 
-    def update(self, result: dict, new_result: dict):
+    def update(self, result: dict, new_result):
         """
         Функция обновления результата
         :param result:
@@ -117,38 +117,28 @@ class DbStageResults(DbMongo):
             print(e)
 
 
+class DbSubsAtheleteClass(DbMongo):
+    __db_name = "users_bot"
+    __collection_name = "subs_class"
+
+    def __init__(self):
+        super().__init__()
+        current_db = self.connection[self.__db_name]
+        self.collection = current_db[self.__collection_name]
+
+    def get_subscriber(self, athelete_class: str):
+        connect = self.collection.find_one({"_id": athelete_class})
+        if connect is None:
+            raise AttributeError(f"Вызване несуществующий ключ - {athelete_class}")
+        return connect["id_tg_users"]
+
+    def add_subscriber(self, athlete_class: str, tg_id: int):
+        pass
+
+
 def main():
-    db_test = DbStageResults()
-    res1 = {
-        "userId": 2,
-        "userFullName": "2",
-        "motorcycle": "3",
-        "userCity": "city",
-        "userCountry": "country",
-        "athleteClass": "class",
-        "resultTimeSeconds": 100000,
-        "resultTime": "time",
-        "fine": 1,  # пенальти
-        "video": "href"
-    }
-    res2 = {
-        "userId": 2,
-        "userFullName": "20",
-        "motorcycle": "30",
-        "userCity": "city0",
-        "userCountry": "country0",
-        "athleteClass": "class0",
-        "resultTimeSeconds": 11111,
-        "resultTime": "time0",
-        "fine": 10,  # пенальти
-        "video": "href0"
-    }
-    assert db_test.add(res1), "Добавление успешно"
-    print(db_test.get(2))
-    db_test.del_result(res2["userId"])
-    db_test.update(res1, res2)
-    print(db_test.get(2))
-    db_test.close()
+    connect = DbSubsAtheleteClass()
+    print(connect.get_subscriber("B"))
 
 
 if __name__ == "__main__":
