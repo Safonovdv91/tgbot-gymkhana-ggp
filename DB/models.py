@@ -125,6 +125,6 @@ class StageSportsmanResult:
     def fine(self, value: int):
         if not isinstance(value, int):
             raise TypeError("Fine must be Integer")
-        if value <= 0:
+        if value < 0:
             raise AttributeError(f"Penalty must be positive value")
         self._fine = value
