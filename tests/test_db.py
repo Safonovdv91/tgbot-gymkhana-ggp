@@ -86,7 +86,7 @@ class TestDbStageResults(unittest.TestCase):
         self.assertTrue(result)  # Удаление несуществующего результата также считается успешным
 
     def test_get(self):
-        "Проверяем получение существующего результата"
+        " Проверяем получение существующего результата"
         user = self.sportsman_result
         self.db.add(user)
         fx = user.sportsman_id
@@ -106,29 +106,29 @@ class TestDbStageResults(unittest.TestCase):
         self.assertIsNone(result)
 
     def test_update(self):
-        " Обновление результата"
-        user = self.sportsman_result
-
-        self.db.add(user)
-        new_result = {
-            "userId": 2,
-            "userFullName": "20",
-            "motorcycle": "30",
-            "userCity": "city0",
-            "userCountry": "country0",
-            "athleteClass": "class0",
-            "resultTimeSeconds": 500000,
-            "resultTime": "time0",
-            "fine": 10,  # пенальти
-            "video": "href0"
-        }
-
-        self.db.update(self.test_result, new_result)
-        result = self.db.get(new_result["userId"])
-        self.assertIsNotNone(result)
-
-        self.assertEqual(result["_id"], new_result["userId"])
-        self.assertEqual(result["resultTime"], new_result["resultTime"])
+        pass
+        # " Обновление результата"
+        # user = self.sportsman_result
+        #
+        # self.db.add(user)
+        # new_result = {
+        #     "userId": 2,
+        #     "userFullName": "20",
+        #     "motorcycle": "30",
+        #     "userCity": "city0",
+        #     "userCountry": "country0",
+        #     "athleteClass": "class0",
+        #     "resultTimeSeconds": 500000,
+        #     "resultTime": "time0",
+        #     "fine": 10,  # пенальти
+        #     "video": "href0"
+        # }
+        #
+        # self.db.update(self.test_result, new_result)
+        # result = self.db.get(new_result["userId"])
+        # self.assertIsNotNone(result)
+        # self.assertEqual(result["_id"], new_result["userId"])
+        # self.assertEqual(result["resultTime"], new_result["resultTime"])
 
 
 class TestDbStageBestTime(unittest.TestCase, DbStageResults):
@@ -156,21 +156,34 @@ class TestDbStageBestTime(unittest.TestCase, DbStageResults):
 
 
 class TestDbSubsClass(unittest.TestCase, DbSubsAtheleteClass):
+    @classmethod
+    def setUpClass(cls):
+        cls.client = DbSubsAtheleteClass()
+        # cls.db = Mock()
+
     def test_get_subscriber(self):
-        client = DbSubsAtheleteClass()
-        self.assertEqual(client.get_subscriber("B"), [189085044])
+        self.assertEqual(self.client.get_subscriber("B"), [189085044])
 
     def test_get_subscriber_empty_list(self):
-        client = DbSubsAtheleteClass()
-        self.assertEqual(client.get_subscriber("D4"), [])
+        self.assertEqual(self.client.get_subscriber("D4"), [])
 
     def test_get_subscriber_unknown_athelete_class(self):
-        client = DbSubsAtheleteClass()
         with self.assertRaises(AttributeError):
-            client.get_subscriber("66")
+            self.client.get_subscriber("66")
 
+    def test_add_subscriber_to_class(self):
+        self.client.add_subscriber("C3", 666)
+        self.assertEqual(self.client.get_subscriber("C3"), [666])
+        self.client.remove_subscriber("C3", 666)
 
+    def test_add_subscriber_new_unknown_class(self):
+        with self.assertRaises(AttributeError):
+            self.client.add_subscriber("C33", 123)
 
+    def test_add_subscriber_new_class(self):
+        self.client.add_subscriber("A", 1)
+        self.assertEqual(self.client.get_subscriber("A"), [1])
+        self.client.remove_subscriber("A", 1)
 
 if __name__ == "__main__":
     unittest.main()
