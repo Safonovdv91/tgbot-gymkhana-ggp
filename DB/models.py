@@ -65,10 +65,10 @@ class Subscriber:
     @sub_stage_categories.setter
     def sub_stage_categories(self, value):
         try:
-            value = set(value)
+            value = list(value)
         except TypeError:
             raise TypeError("Transform to SET impossible")
-        if (value is None) or not (isinstance(value, set)):
+        if (value is None) or not (isinstance(value, list)):
             raise TypeError
 
         self._sub_stage_categories = value

@@ -35,17 +35,19 @@ class DbTgUsers(DbMongo):
         current_db = self.connection[self.__db_name]
         self.collection = current_db[self.__collection_name]
 
-    def add_tg_subscriber(self, tg_user_id):
+    def add_tg_subscriber(self, tg_user_id, subs_stage=None):
+        if subs_stage is None:
+            subs_stage = []
         if self.get_tg_subscriber(tg_user_id) is None:
             self.collection.insert_one({
                 "_id": tg_user_id,
                 "sub_stage": False,
-                "sub_stage_cat": []
+                "sub_stage_cat": subs_stage
             })
             return True
         return False
 
-    def get_tg_subscriber(self, tg_user_id):
+    def get_tg_subscriber(self, tg_user_id) -> dict:
         return self.collection.find_one({"_id": tg_user_id})
 
     def update(self, user_id, key: str, value: str):
@@ -181,6 +183,7 @@ class DbSubsAtheleteClass(DbMongo):
 
 def main():
     pass
+    print(DbTgUsers().get_tg_subscriber(189085044))
     # connect = DbSubsAtheleteClass()
     # print(connect.get_subscriber("A"))
     # i = 0
