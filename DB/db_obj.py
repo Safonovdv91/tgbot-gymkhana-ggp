@@ -69,7 +69,7 @@ class DbStageResults(DbMongo):
 
     def add(self, result: StageSportsmanResult):
         """
-        функция добалвения  новгого результата
+        функция добалвения  новогого результата
         :param result:
         :return:
         """
@@ -183,15 +183,6 @@ class DbSubsAtheleteClass(DbMongo):
 
 def main():
     pass
-    print(DbTgUsers().get_tg_subscriber(189085044))
-    # connect = DbSubsAtheleteClass()
-    # print(connect.get_subscriber("A"))
-    # i = 0
-    # connect.add_subscriber("A", 1)
-    #  onnect.remove_subscriber("A", 1)
-    # print(connect.get_subscriber("A"))
-    # # print(connect.remove_subscriber("A", 1))
-    # print(connect.get_subscriber("C3"))
 
 
 if __name__ == "__main__":
