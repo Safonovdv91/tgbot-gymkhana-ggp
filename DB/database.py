@@ -39,7 +39,7 @@ def add_subscriber(user_id: int):
 
 def update_subscriber(user_id: int, field: str, status):
     """ Обновление статуса поля подпиcчика
-    """
+    ""
     db = DbTgUsers()
     db.update(user_id=user_id, key=field, value=status)
     db.close()
