@@ -1,4 +1,4 @@
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardButton, InlineKeyboardMarkup
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from DB.db_obj import DbTgUsers
 
 btnBackToMenu = KeyboardButton("⬅ НАЗАД")
@@ -7,9 +7,9 @@ btnBackToMenu = KeyboardButton("⬅ НАЗАД")
 btnStageMap = KeyboardButton("Получить 🗺 этапа")
 btnStageTime = KeyboardButton("Получить 🕗 этапа")
 btnSubscribe = KeyboardButton("Подписаться")
-btnSubscribeNews1 = KeyboardButton("Подписаться news")
+btnSubscribeNews = KeyboardButton("Подписаться news")
 
-mainMenu = ReplyKeyboardMarkup(resize_keyboard=True).add(btnSubscribe, btnStageMap, btnStageTime, btnSubscribeNews1)
+mainMenu = ReplyKeyboardMarkup(resize_keyboard=True).add(btnSubscribe, btnStageMap, btnStageTime)
 
 # --- Subscribe Menu ---
 sub_B = KeyboardButton('🟦🇧')
@@ -53,10 +53,10 @@ class SubscriberMenu:
 
 # --- Subscribe to news ---
 
-btnSubscribeNews = InlineKeyboardMarkup(row_width=1)
-btn1 = InlineKeyboardButton(text="🟢 Подписаться на мировой рекорд", callback_data='fx1')
-btn2 = InlineKeyboardButton(text="🟢 Подписаться регистрацию этапа", callback_data='fx2')
-btn3 = InlineKeyboardButton(text="🟠 ОТПИСАТЬСЯ от мирового рекорда", callback_data='fx3')
-btn4 = InlineKeyboardButton(text="🟠 ОТПИСАТЬСЯ на регистрацию этапа", callback_data='fx4')
-
-btnSubscribeNews.add(btn1, btn2)
+# btnSubscribeNews = InlineKeyboardMarkup(row_width=1)
+# btn1 = InlineKeyboardButton(text="🟢 Подписаться на мировой рекорд", callback_data='fx1')
+# btn2 = InlineKeyboardButton(text="🟢 Подписаться регистрацию этапа", callback_data='fx2')
+# btn3 = InlineKeyboardButton(text="🟠 ОТПИСАТЬСЯ от мирового рекорда", callback_data='fx3')
+# btn4 = InlineKeyboardButton(text="🟠 ОТПИСАТЬСЯ на регистрацию этапа", callback_data='fx4')
+#
+# btnSubscribeNews.add(btn1, btn2)
