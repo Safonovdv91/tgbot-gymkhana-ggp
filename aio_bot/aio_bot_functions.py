@@ -1,9 +1,7 @@
-import math
-
-
 class BotFunction:
 
-    def convert_to_milliseconds(self, mmssms: [float, str]) -> int:
+    @staticmethod
+    def convert_to_milliseconds(mmssms: [float, str]) -> int:
         """Метод преобразования в миллисекунды
         получает форматы:
         01:02.563 = 62563
@@ -30,9 +28,10 @@ class BotFunction:
                 return None
         return int(seconds * 1_000) + minutes * 60_000
 
-
-    def milliseconds_to_mmssms(self, milliseconds):
-        # Проверка milliseconds на верный вход данных
+    @staticmethod
+    def msec_to_mmssms(milliseconds: int):
+        """ Проверка milliseconds на верный вход данных
+        """
         try:
             milliseconds = int(milliseconds)
         except ValueError:
@@ -47,21 +46,23 @@ class BotFunction:
         mmssms_format: str = "{:02d}:{:02d}.{:03d}".format(minutes, seconds, milliseconds)
         return mmssms_format
 
-    def make_calculate_text(self, best_time_ms):
-        # Генерируем исходящее сообщение
-        text = f'🟦 🇧: {self.milliseconds_to_mmssms(best_time_ms)} - {self.milliseconds_to_mmssms(best_time_ms*1.05 - 1)} \n'\
-        f'🟩 С1: {self.milliseconds_to_mmssms(best_time_ms*1.05)} - {self.milliseconds_to_mmssms(best_time_ms * 1.10 - 1)} \n' \
-        f'🟩 С2: {self.milliseconds_to_mmssms(best_time_ms * 1.10)} - {self.milliseconds_to_mmssms(best_time_ms * 1.15 - 1)} \n' \
-        f'🟩 С3: {self.milliseconds_to_mmssms(best_time_ms*1.15)} - {self.milliseconds_to_mmssms(best_time_ms * 1.20 - 1)} \n' \
-        f'🟨 D1: {self.milliseconds_to_mmssms(best_time_ms*1.20)} - {self.milliseconds_to_mmssms(best_time_ms * 1.30 - 1)} \n' \
-        f'🟨 D2: {self.milliseconds_to_mmssms(best_time_ms * 1.30)} - {self.milliseconds_to_mmssms(best_time_ms * 1.40 - 1)} \n' \
-        f'🟨 D3: {self.milliseconds_to_mmssms(best_time_ms * 1.40)} - {self.milliseconds_to_mmssms(best_time_ms * 1.50 - 1)} \n' \
-        f'🟨 D4: {self.milliseconds_to_mmssms(best_time_ms * 1.50)} - {self.milliseconds_to_mmssms(best_time_ms * 1.60 - 1)} '
+    def make_calculate_text(self, best_time_ms: (int, float)):
+        """ Генерируем исходящее сообщение
+        """
+        text = f'🟦 🇧: {self.msec_to_mmssms(best_time_ms)} - {self.msec_to_mmssms(best_time_ms * 1.05 - 1)} \n' \
+               f'🟩 С1: {self.msec_to_mmssms(best_time_ms * 1.05)} - {self.msec_to_mmssms(best_time_ms * 1.10 - 1)} \n' \
+               f'🟩 С2: {self.msec_to_mmssms(best_time_ms * 1.10)} - {self.msec_to_mmssms(best_time_ms * 1.15 - 1)} \n' \
+               f'🟩 С3: {self.msec_to_mmssms(best_time_ms * 1.15)} - {self.msec_to_mmssms(best_time_ms * 1.20 - 1)} \n' \
+               f'🟨 D1: {self.msec_to_mmssms(best_time_ms * 1.20)} - {self.msec_to_mmssms(best_time_ms * 1.30 - 1)} \n' \
+               f'🟨 D2: {self.msec_to_mmssms(best_time_ms * 1.30)} - {self.msec_to_mmssms(best_time_ms * 1.40 - 1)} \n' \
+               f'🟨 D3: {self.msec_to_mmssms(best_time_ms * 1.40)} - {self.msec_to_mmssms(best_time_ms * 1.50 - 1)} \n' \
+               f'🟨 D4: {self.msec_to_mmssms(best_time_ms * 1.50)} - {self.msec_to_mmssms(best_time_ms * 1.60 - 1)} '
         return text
 
 
 def main():
     pass
+
 
 if __name__ == "__main__":
     main()
