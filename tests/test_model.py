@@ -98,8 +98,8 @@ class TestModelSubscriber(unittest.TestCase):
     def test_good_stage_setter(self):
         tester = self.tester
 
-        tester.sub_stage_categories = {"C1", "C2"}
-        self.assertEqual(tester.sub_stage_categories, {"C1", "C2"})
+        tester.sub_stage_categories = ["C1", "C2"]
+        self.assertEqual(tester.sub_stage_categories, ["C1", "C2"])
 
 
 class TestStageSubscribers(unittest.TestCase):
