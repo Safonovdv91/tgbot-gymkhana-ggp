@@ -50,6 +50,10 @@ class DbTgUsers(DbMongo):
     def get_tg_subscriber(self, tg_user_id) -> dict:
         return self.collection.find_one({"_id": tg_user_id})
 
+    def get_all_subscribers(self):
+        cursor = self.collection.find()
+        return cursor
+
     def update(self, user_id, key: str, value: str):
         """ Обновление статуса подписчика
         """
@@ -182,7 +186,11 @@ class DbSubsAtheleteClass(DbMongo):
 
 
 def main():
-    pass
+    client = DbTgUsers().get_all_subscribers()
+    for each in client:
+        if len(each["sub_stage_cat"]):
+            print(each["_id"])
+
 
 
 if __name__ == "__main__":
