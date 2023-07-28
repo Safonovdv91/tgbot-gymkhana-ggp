@@ -1,22 +1,18 @@
 import logging
 
 from DB.db_obj import DbTgUsers, DbStageResults, DbSubsAtheleteClass
-from aio_bot import config_bot
 from DB.models import Subscriber
 
-# IP_ADDRESS_MONGO_DB = config_bot.config["ip_mongo_database"]
-
-# необходимо сделать название колекции по id_stage, а спорсменов добавлять с _id
 
 def add_stage_result(result) -> bool:
-    """Функция добавления нового результата спортсмена"""
+    """ Функция добавления нового результата спортсмена"""
     client = DbStageResults()
     client.add(result)
     return result
 
 
 def update_stage_result(result):
-    """Функция добавления нового результата спортсмена"""
+    """ Функция добавления нового результата спортсмена"""
     client = DbStageResults()
     client.del_result(result.sportsman_id)
     add_stage_result(result)
@@ -24,7 +20,7 @@ def update_stage_result(result):
 
 
 def find_one_sportsman_from_stage(user_id: int):
-    """Получение данных спортсмена из этапа"""
+    """ Получение данных спортсмена из этапа"""
     db_client = DbStageResults()
     return db_client.get(user_id)
 
@@ -39,7 +35,7 @@ def add_subscriber(user_id: int):
 
 def update_subscriber(user_id: int, field: str, status):
     """ Обновление статуса поля подпиcчика
-    ""
+    """
     db = DbTgUsers()
     db.update(user_id=user_id, key=field, value=status)
     db.close()
