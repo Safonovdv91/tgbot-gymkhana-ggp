@@ -2,7 +2,8 @@ from aiogram import Bot, Dispatcher, executor, types
 from aio_bot import config_bot
 from aio_bot import aio_markups as nav
 from DB import database as DBM
-from DB.db_obj import DbStageResults
+from DB.db_obj import DbStageResults, DbSubsAtheleteClass
+from DB.models import StageSportsmanResult
 
 # import os
 import logging
@@ -78,25 +79,34 @@ async def subscribe_results(message: types.Message):
     """
     if message.text == "Подписаться":
         await bot.send_message(message.from_user.id, "Выбери на какой класс подписаться",
-                               reply_markup=nav.subscribeMenu)
-    elif message.text == "🟦🇧":
-        await message.answer(DBM.update_user_subs(message.from_user.id, "🟦🇧", "B"))
-    elif message.text == "🟩 С1":
-        await message.answer(DBM.update_user_subs(message.from_user.id, "🟩 С1", "C1"))
-    elif message.text == "🟩 С2":
-        await message.answer(DBM.update_user_subs(message.from_user.id, "🟩 С2", "C2"))
-    elif message.text == "🟩 С3":
-        await message.answer(DBM.update_user_subs(message.from_user.id, "🟩 С3", "C3"))
-    elif message.text == "🟨 D1":
-        await message.answer(DBM.update_user_subs(message.from_user.id, "🟨 D1", "D1"))
-    elif message.text == "🟨 D2":
-        await message.answer(DBM.update_user_subs(message.from_user.id, "🟨 D2", "D2"))
-    elif message.text == "🟨 D3":
-        await message.answer(DBM.update_user_subs(message.from_user.id, "🟨 D3", "D3"))
-    elif message.text == "🟨 D4":
-        await message.answer(DBM.update_user_subs(message.from_user.id, "🟨 D4", "D4"))
+                               reply_markup=nav.SubscriberMenu().subscriber_menu_btn(message.from_user.id))
+    elif message.text in ("🟦🇧", "🔲 🇧"):
+        await message.answer(DBM.update_user_subs(message.from_user.id, "🟦🇧", "B"),
+                             reply_markup=nav.SubscriberMenu().subscriber_menu_btn(message.from_user.id))
+    elif message.text in ("🟩 С1", "🔲 С1"):
+        await message.answer(DBM.update_user_subs(message.from_user.id, "🟩 С1", "C1"),
+                             reply_markup=nav.SubscriberMenu().subscriber_menu_btn(message.from_user.id))
+    elif message.text in ("🟩 С2", "🔲 С2"):
+        await message.answer(DBM.update_user_subs(message.from_user.id, "🟩 С2", "C2"),
+                             reply_markup=nav.SubscriberMenu().subscriber_menu_btn(message.from_user.id))
+    elif message.text in ("🟩 С3", "🔲 С3"):
+        await message.answer(DBM.update_user_subs(message.from_user.id, "🟩 С3", "C3"),
+                             reply_markup=nav.SubscriberMenu().subscriber_menu_btn(message.from_user.id))
+    elif message.text in ("🟨 D1", "🔲 D1"):
+        await message.answer(DBM.update_user_subs(message.from_user.id, "🟨 D1", "D1"),
+                             reply_markup=nav.SubscriberMenu().subscriber_menu_btn(message.from_user.id))
+    elif message.text in ("🟨 D2", "🔲 D2"):
+        await message.answer(DBM.update_user_subs(message.from_user.id, "🟨 D2", "D2"),
+                             reply_markup=nav.SubscriberMenu().subscriber_menu_btn(message.from_user.id))
+    elif message.text in ("🟨 D3", "🔲 D3"):
+        await message.answer(DBM.update_user_subs(message.from_user.id, "🟨 D3", "D3"),
+                             reply_markup=nav.SubscriberMenu().subscriber_menu_btn(message.from_user.id))
+    elif message.text in ("🟨 D4", "🔲 D4"):
+        await message.answer(DBM.update_user_subs(message.from_user.id, "🟨 D4", "D4"),
+                             reply_markup=nav.SubscriberMenu().subscriber_menu_btn(message.from_user.id))
     elif message.text == "⬅ НАЗАД":
         await bot.send_message(message.from_user.id, "Главное меню", reply_markup=nav.mainMenu)
+
     elif message.text == "Получить 🗺 этапа":
         try:
             if config_bot.config_gymchana_cup["trackUrl"]:
@@ -157,14 +167,21 @@ async def scheduled():
             get_results_from_stage = data_dic["results"]
             for each in get_results_from_stage:
                 msg_text = False
-                db_sportsman = DBM.find_one_sportsman_from_stage(config_bot.config_gymchana_cup["id_stage_now"],
-                                                                 each["userId"])
+                sportsman_result = StageSportsmanResult(each["userId"], each["userFullName"],
+                                                        each["motorcycle"],
+                                                        each["userCity"], each["userCountry"],
+                                                        each["athleteClass"],
+                                                        each["resultTimeSeconds"], each["resultTime"],
+                                                        each["fine"],
+                                                        each["video"])
+
+                db_sportsman = DBM.find_one_sportsman_from_stage(each["userId"])
                 if db_sportsman is None:
                     msg_text = f"{each['athleteClass']}: {each['userFullName']} - {each['resultTime']}\n{each['video']}"
                     msg_text = f"⚡ Новый результат\n{msg_text}"
 
                     # Добавляем новый результат спортсмена в базу данных
-                    DBM.add_stage_result(config_bot.config_gymchana_cup['id_stage_now'], each)
+                    DBM.add_stage_result(sportsman_result)
 
                 else:
                     if each["resultTimeSeconds"] < db_sportsman["resultTimeSeconds"]:
@@ -173,11 +190,11 @@ async def scheduled():
                         msg_text = f"💥 Улучшил время\n {msg_text}"
 
                         # Обновляем новый результат спортсмена в базе данных
-                        DBM.update_stage_result(config_bot.config_gymchana_cup['id_stage_now'], each)
+                        DBM.update_stage_result(sportsman_result)
 
                 # Разсылаем сообщения
                 if msg_text:
-                    tg_clients = DBM.get_tg_subs(each["athleteClass"])
+                    tg_clients = DbSubsAtheleteClass().get_subscriber(each["athleteClass"])
                     for tg_client in tg_clients:
                         await bot.send_message(tg_client, msg_text, disable_notification=True)
 
@@ -185,6 +202,7 @@ async def scheduled():
             logging.exception("aio_bot_start")
             logging.exception(e)
             await bot.send_message(admin_id, f"Exception{e}")
+
 
 # Запускаем лонг поллинг
 def main():
