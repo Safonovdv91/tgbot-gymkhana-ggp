@@ -1,9 +1,7 @@
 import logging
-
-from aio_bot import config_bot
-
 import requests
 
+from aio_bot import config_bot
 from datetime import datetime
 
 API_GYMKHANA = config_bot.config_gymchana_cup["API"]
@@ -34,7 +32,7 @@ def get_sportsmans_from_ggp_stage(site=SITE, api_gymkhana=API_GYMKHANA):
             config_bot.config_gymchana_cup["trackUrl"] = now_stage["trackUrl"]
             return get_api.json()
 
-    # сделать задержу проверки результатов бота в секундах
+    # задержка проверки результатов бота в секундах
     logging.info("Сейчас нет приема результатов, устанавливаем повышенный таймаут")
     config_bot.config_gymchana_cup["GET_TIME_OUT"] = 3600 * 6
     logging.info(f"Таймаут = {config_bot.config_gymchana_cup['GET_TIME_OUT']}")
