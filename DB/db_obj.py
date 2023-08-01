@@ -73,7 +73,7 @@ class DbStageResults(DbMongo):
 
     def add(self, result: StageSportsmanResult):
         """
-        функция добалвения  новогого результата
+        Функция добавления новогого результата
         :param result:
         :return:
         """
