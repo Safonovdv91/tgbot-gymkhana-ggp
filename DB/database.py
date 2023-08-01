@@ -42,7 +42,7 @@ def update_subscriber(user_id: int, field: str, status):
 
 
 def update_user_subs(user_id: int, sport_class, user_sub: str):
-    """ Функция обнавляющая список на какой подписан пользователь
+    """ Функция обновляющая список на какой подписан пользователь
     """
     client = DbTgUsers()
     tg_client = client.get_tg_subscriber(user_id)
@@ -87,7 +87,7 @@ def update_user_subs(user_id: int, sport_class, user_sub: str):
             try:
                 subs_athelete.add_subscriber(user_sub, tg_subscriber.subscriber_id)
             except ValueError:
-                logging.info("Нехуй добавлять")
+                logging.info("Нечего добавлять")
             return f"Вы успешно ПОДПИСАЛИСЬ на {sport_class}"
 
 
