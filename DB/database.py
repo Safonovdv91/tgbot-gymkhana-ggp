@@ -67,7 +67,7 @@ def update_user_subs(user_id: int, sport_class, user_sub: str):
         logging.info(f"New subscriber id: {tg_subscriber.subscriber_id} {sport_class}")
         """ --- recursion --- """
         update_user_subs(user_id, sport_class, user_sub)
-        return "You are welcome"
+        return "😸 You are welcome 😸"
     else:
         tg_subscriber = Subscriber(tg_client["_id"], tg_client["sub_stage"], tg_client["sub_stage_cat"])
         if user_sub in tg_subscriber.sub_stage_categories:
