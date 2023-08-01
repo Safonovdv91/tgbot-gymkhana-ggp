@@ -70,7 +70,6 @@ class DbStageResults(DbMongo):
     DB_NAME = "ggp"
 
     def __init__(self):
-
         super().__init__()
         self.current_db = self.connection[self.DB_NAME]
         self.collection = self.current_db[f"stage_{config_bot.config_gymchana_cup['id_stage_now']}"]
@@ -120,13 +119,13 @@ class DbStageResults(DbMongo):
             self.del_result(result["userId"])
         self.add(new_result)
 
-    def get_bestStage_time(self):
+    def get_bestStage_time(self) -> int | None:
         try:
             return self.collection.find().sort("resultTimeSeconds").limit(1)[0]["resultTimeSeconds"]
         except IndexError:
             return None
         except Exception as e:
-            print(e)
+            logging.exception(f"get_best_stage: {e}")
 
 
 class DbSubsAtheleteClass(DbMongo):
