@@ -2,6 +2,7 @@ import logging
 
 from pymongo import MongoClient
 from pymongo import errors
+from pymongo.results import DeleteResult
 from aio_bot import config_bot
 from DB.models import StageSportsmanResult
 
@@ -60,6 +61,9 @@ class DbTgUsers(DbMongo):
         if self.get_tg_subscriber(user_id) is None:
             return False
         self.collection.update_one({"_id": user_id}, {"$set": {key: value}})
+
+    def remove_tg_subscriber(self, tg_user_id) -> DeleteResult:
+        return self.collection.delete_one({"_id": tg_user_id})
 
 
 class DbStageResults(DbMongo):
@@ -174,7 +178,6 @@ class DbSubsAtheleteClass(DbMongo):
     def remove_subscriber(self, athelete_class: str, tg_id: int) -> bool:
         """ Отписка подписчика
         """
-
         if tg_id not in self.get_subscriber(athelete_class):
             raise ValueError(f"Пользователь {tg_id} и так не подписан на {athelete_class}")
         try:
@@ -190,7 +193,6 @@ def main():
     for each in client:
         if len(each["sub_stage_cat"]):
             print(each["_id"])
-
 
 
 if __name__ == "__main__":
