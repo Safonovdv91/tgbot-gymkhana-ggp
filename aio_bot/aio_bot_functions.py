@@ -68,6 +68,8 @@ class BotFunction:
 class BotInterface:
     @staticmethod
     def unsub_tguser(tg_user_id):
+        """ Удаление подписчика из БД
+        """
         for athelete_class in DbSubsAtheleteClass.ATHELETE_CLASSES:
             try:
                 DbSubsAtheleteClass().remove_subscriber(athelete_class, tg_user_id)

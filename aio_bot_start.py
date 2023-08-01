@@ -179,6 +179,7 @@ async def scheduled():
             --- New stage ---"""
             get_results_from_stage = data_dic["results"]
             for each in get_results_from_stage:
+                b_result = DbStageResults().get_bestStage_time()
                 msg_text = False
                 sportsman_result = StageSportsmanResult(each["userId"], each["userFullName"],
                                                         each["motorcycle"],
@@ -190,7 +191,13 @@ async def scheduled():
 
                 db_sportsman = DBM.find_one_sportsman_from_stage(each["userId"])
                 if db_sportsman is None:
-                    msg_text = f"{each['athleteClass']}: {each['userFullName']} - {each['resultTime']}\n{each['video']}"
+                    if b_result is None:
+                        persents = 100
+                    else:
+                        persents = round(each["resultTimeSeconds"] / b_result * 100, 2)
+                    msg_text = f" {each['athleteClass']}: {each['userFullName']} \n " \
+                               f"{persents}% |   {each['resultTime']}\n" \
+                               f"{each['video']}"
                     msg_text = f"⚡ Новый результат\n{msg_text}"
 
                     # Добавляем новый результат спортсмена в базу данных
@@ -198,7 +205,12 @@ async def scheduled():
 
                 else:
                     if each["resultTimeSeconds"] < db_sportsman["resultTimeSeconds"]:
-                        msg_text = f"{each['athleteClass']}: {each['userFullName']} - {each['resultTime']} \n" \
+                        if b_result is None:
+                            persents = 100
+                        else:
+                            persents = round(each["resultTimeSeconds"] / b_result * 100, 2)
+                        msg_text = f" {each['athleteClass']}: {each['userFullName']} \n " \
+                                   f"{persents}% |   {each['resultTime']}\n " \
                                    f"было: [{db_sportsman['resultTime']}] \n {each['video']} "
                         msg_text = f"💥 Улучшил время\n {msg_text}"
 
