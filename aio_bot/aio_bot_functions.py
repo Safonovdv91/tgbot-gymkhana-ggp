@@ -1,7 +1,12 @@
+import logging
+from typing import Any
+from DB.db_obj import DbTgUsers, DbSubsAtheleteClass
+
+
 class BotFunction:
 
     @staticmethod
-    def convert_to_milliseconds(mmssms: [float, str]) -> int:
+    def convert_to_milliseconds(mmssms: [float, str]) -> int | None | Any:
         """Метод преобразования в миллисекунды
         получает форматы:
         01:02.563 = 62563
@@ -58,6 +63,20 @@ class BotFunction:
                f'🟨 D3: {self.msec_to_mmssms(best_time_ms * 1.40)} - {self.msec_to_mmssms(best_time_ms * 1.50 - 1)} \n' \
                f'🟨 D4: {self.msec_to_mmssms(best_time_ms * 1.50)} - {self.msec_to_mmssms(best_time_ms * 1.60 - 1)} '
         return text
+
+
+class BotInterface:
+    @staticmethod
+    def unsub_tguser(tg_user_id):
+        for athelete_class in DbSubsAtheleteClass.ATHELETE_CLASSES:
+            try:
+                DbSubsAtheleteClass().remove_subscriber(athelete_class, tg_user_id)
+            except ValueError:
+                pass
+            except Exception as e:
+                logging.exception(f"BotInterface: {e}")
+        DbTgUsers().remove_tg_subscriber(tg_user_id)
+        logging.info(f"Deleting success")
 
 
 def main():
