@@ -1,4 +1,5 @@
 from aiogram import Bot, Dispatcher, executor, types
+from aiogram.types import InputFile
 from aiogram.utils.exceptions import BotBlocked
 
 from aio_bot.aio_bot_functions import BotInterface
@@ -13,7 +14,6 @@ import logging
 import asyncio
 import get_info_api
 from aio_bot import aio_bot_functions
-
 
 API_bot = config_bot.config['API_token']
 admin_id = config_bot.config['admin_id']
@@ -41,7 +41,7 @@ async def start_bot(message: types.Message):
            "затягивать вот что я умею: \n" \
            "'✒Подписаться' - здесь ты можешь подписаться на результаты спортсменов " \
            "катающих этап GGP 2023. Просто нажимай 'Подписаться' и выбирай классы которые" \
-           " тебя интересуют, как только "\
+           " тебя интересуют, как только " \
            "их результат выложат - я пришлю тебе уведомление. \n " \
            "Получить 🗺 этапа' - тут ты можешь получить текущий этап GGP 2023, если вдруг забыл куда ехать" \
            " - нажимай и учи. \n" \
@@ -115,7 +115,10 @@ async def subscribe_results(message: types.Message):
     elif message.text == "Получить 🗺 этапа":
         try:
             if config_bot.config_gymchana_cup["trackUrl"]:
-                await bot.send_message(message.from_user.id, config_bot.config_gymchana_cup["trackUrl"])
+                url = f"https://gymkhana-cup.ru/competitions/special-stage?id={config_bot.config_gymchana_cup['id_stage_now']}"
+                await bot.send_message(message.from_user.id, url)
+                photo = InputFile("DB/stage.jpg")
+                await bot.send_photo(chat_id=message.chat.id, photo=photo)
             else:
                 await bot.send_message(message.from_user.id, " Сейчас межсезонье мэн, покатай базовую фигуру")
         except Exception as e:
@@ -171,6 +174,7 @@ async def scheduled():
             if id_stage_now != config_bot.config_gymchana_cup["id_stage_now"]:
                 for each in DbTgUsers().get_all_subscribers():
                     if len(each["sub_stage_cat"]):
+                        !!! download_stage_map !!!
                         new_stage_msg = f"Ура, начался новый этап! Надеюсь погода будет благоволить тебе ️☀️☀️," \
                                         f" а результат вызывать восхищение 🤩! Помни что первым можно быть не только " \
                                         f"по времени проезда!\n Но и первым кто выложит результат!😉 " \
