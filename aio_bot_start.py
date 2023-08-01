@@ -1,8 +1,11 @@
 from aiogram import Bot, Dispatcher, executor, types
+from aiogram.utils.exceptions import BotBlocked
+
+from aio_bot.aio_bot_functions import BotInterface
 from aio_bot import config_bot
 from aio_bot import aio_markups as nav
 from DB import database as DBM
-from DB.db_obj import DbStageResults, DbSubsAtheleteClass, DbTgUsers
+from DB.db_obj import DbStageResults, DbSubsAtheleteClass
 from DB.models import StageSportsmanResult
 
 # import os
@@ -31,10 +34,10 @@ bot = Bot(token=API_bot, parse_mode=types.ParseMode.HTML)
 dp = Dispatcher(bot)
 
 
-# Инициализация меню по нажатию страрт
+# Инициализация меню по нажатию старт
 @dp.message_handler(commands=['start'])
 async def start_bot(message: types.Message):
-    text = "Олоха мой джимхо друг, я бот создаyный немного помочь тебе в мотоджимхане не будем " \
+    text = "Олоха мой джимхо друг, я бот созданный немного помочь тебе в мотоджимхане, не будем " \
            "затягивать вот что я умею: \n" \
            "'✒Подписаться' - здесь ты можешь подписаться на результаты спортсменов " \
            "катающих этап GGP 2023. Просто нажимай 'Подписаться' и выбирай классы которые" \
@@ -70,7 +73,9 @@ async def help_bot(message: types.Message):
 @dp.message_handler(commands=["unsub"])
 async def unsubscribe_bot(message: types.Message):
     """Удаляем все подписки у пользователя"""
-    pass
+    logging.info(f"User unsub - {message.from_user.id}. Delete him.")
+    BotInterface.unsub_tguser(message.from_user.id)
+    await message.answer("Прощай друг 😿")
 
 
 @dp.message_handler()
@@ -115,7 +120,6 @@ async def subscribe_results(message: types.Message):
                 await bot.send_message(message.from_user.id, " Сейчас межсезонье мэн, покатай базовую фигуру")
         except Exception as e:
             logging.exception(f"Поймано исключение при отправке карты этапа {message.from_user.id} : -", e)
-            print(f"Поймано исключение при отправке карты этапа {message.from_user.id} : -", e)
             await message.answer("Бро, что-то пошло не так 8'(- скорее всего сервак лежит, запроси карту попозже...")
             await bot.send_message(admin_id, f'❗ Поймано исключение при отправке карты этапа от {message.from_user.id}:'
                                              f'\n {e}')
@@ -144,7 +148,6 @@ async def subscribe_results(message: types.Message):
                                      ' воспользуйся встроенным меню ;)↘ или напиши /help',
                                      reply_markup=nav.mainMenu)
         except Exception as e:
-            print(e)
             logging.error(e)
             await message.answer('Братишка, не надо просто так писать,'
                                  ' воспользуйся встроенным меню ;)↘ или напиши /help',
@@ -164,7 +167,7 @@ async def scheduled():
             data_dic = get_info_api.get_sportsmans_from_ggp_stage()
             if not data_dic:
                 return False
-            """--- New stage! ---"""
+            """--- New stage! ---
             if id_stage_now != config_bot.config_gymchana_cup["id_stage_now"]:
                 for each in DbTgUsers().get_all_subscribers():
                     if len(each["sub_stage_cat"]):
@@ -173,7 +176,7 @@ async def scheduled():
                                         f"по времени проезда!\n Но и первым кто выложит результат!😉 " \
                                         f"{config_bot.config_gymchana_cup['trackUrl']}"
                         await bot.send_message(each["_id"], new_stage_msg)
-            """--- New stage ---"""
+            --- New stage ---"""
             get_results_from_stage = data_dic["results"]
             for each in get_results_from_stage:
                 msg_text = False
@@ -206,8 +209,12 @@ async def scheduled():
                 if msg_text:
                     tg_clients = DbSubsAtheleteClass().get_subscriber(each["athleteClass"])
                     for tg_client in tg_clients:
-                        await bot.send_message(tg_client, msg_text, disable_notification=True)
-
+                        try:
+                            await bot.send_message(tg_client, msg_text, disable_notification=True)
+                        except BotBlocked:
+                            """ Бот заблокирован, значит удаляем из подписок"""
+                            logging.info(f"Bot is blocked user - {tg_clients}. Delete him.")
+                            BotInterface.unsub_tguser(tg_client)
         except Exception as e:
             logging.exception(f"aio_bot_start: {e}")
             await bot.send_message(admin_id, f"Exception {e}")
