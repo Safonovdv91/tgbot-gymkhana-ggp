@@ -1,7 +1,10 @@
+from typing import Any
+
+
 class BotFunction:
 
     @staticmethod
-    def convert_to_milliseconds(mmssms: [float, str]) -> int:
+    def convert_to_milliseconds(mmssms: [float, str]) -> int | None | Any:
         """Метод преобразования в миллисекунды
         получает форматы:
         01:02.563 = 62563
