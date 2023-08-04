@@ -15,6 +15,9 @@ def get_sportsmans_from_ggp_stage(site=SITE, api_gymkhana=API_GYMKHANA):
     # получаем действующий ЧЕМПИОНАТ
     get_api = requests.get(f"{site}championships/list?signature={api_gymkhana}&types=gp&fromYear={datetime.now().year}"
                            f"&toYear={datetime.now().year}")
+    if not get_api.ok:
+        logging.exception("Server or API-key is invalid")
+        raise Exception("get_sportsmans_from_ggp_stage [Responce 500] API or Server invalid")
     championship_id = get_api.json()[0]["id"]
 
     # взяв ID действующего чемпионата получаем его этапы и после проходим по ним пока не найдем действующий
