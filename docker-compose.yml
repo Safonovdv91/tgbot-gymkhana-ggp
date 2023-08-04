@@ -1,24 +1,29 @@
 version: '3'
 services:
-  bot:
-    build: .
-    command: python aio_bot_start.py
-    restart: always
-    depends_on:
-      - db
-    networks:
-      - custom
-
-
-  db:
+  mongodb:
     image: mongo
     restart: always
     volumes:
       - ./data:/data/db
+    ports:
+      - "27017:27017"
     networks:
-      - custom
+      mynetwork:
+        ipv4_address: 172.16.0.2
 
+  python:
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      mynetwork:
+        ipv4_address: 172.16.0.3
+    command: python aio_bot_start.py
 
 networks:
-  custom:
-    driver: bridge
+  mynetwork:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.0.0/24
