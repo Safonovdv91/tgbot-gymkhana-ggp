@@ -26,8 +26,12 @@ admin_id = config_bot.config['admin_id']
 
 
 # задаем логирование
-logging.basicConfig(level=logging.INFO, filename="bot_log.log",
-                    filemode="w", format="%(asctime)s %(levelname)s %(message)s")
+logging.basicConfig(level=logging.INFO,
+                    filename="bot_log.log",
+                    filemode="w",
+                    format="%(asctime)s %(levelname)s %(message)s",
+                    datefmt="%Y-%m-%d %H:%M:%S"
+                    )
 
 
 # инициализируем бота
