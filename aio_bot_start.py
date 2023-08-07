@@ -26,8 +26,9 @@ admin_id = config_bot.config['admin_id']
 
 
 # задаем логирование
-logging.basicConfig(level=logging.INFO, filename="aio_bot/logs/bot_log.log",
+logging.basicConfig(level=logging.INFO, filename="bot_log.log",
                     filemode="w", format="%(asctime)s %(levelname)s %(message)s")
+
 
 # инициализируем бота
 bot = Bot(token=API_bot, parse_mode=types.ParseMode.HTML)
@@ -151,7 +152,7 @@ async def subscribe_results(message: types.Message):
                                      ' воспользуйся встроенным меню ;)↘ или напиши /help',
                                      reply_markup=nav.mainMenu)
         except Exception as e:
-            logging.error(e)
+            logging.error(f"Common error: {e}", exc_info=True)
             await message.answer('Братишка, не надо просто так писать,'
                                  ' воспользуйся встроенным меню ;)↘ или напиши /help',
                                  reply_markup=nav.mainMenu)
@@ -229,7 +230,7 @@ async def scheduled():
                             await bot.send_message(tg_client, msg_text, disable_notification=True)
                         except BotBlocked:
                             """ Бот заблокирован, значит удаляем из подписок"""
-                            logging.info(f"Bot is blocked user - {tg_clients}. Delete him.")
+                            logging.info(f"Bot is blocked user - {tg_client}. Delete him.")
                             BotInterface.unsub_tguser(tg_client)
         except Exception as e:
             logging.exception(f"aio_bot_start: {e}")
