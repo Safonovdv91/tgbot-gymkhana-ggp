@@ -1,4 +1,4 @@
-FROM python:3.9.16-slim-buster
+FROM python:3.10-bullseye
 COPY . .
 WORKDIR .
 RUN python3 -m pip install -r requirements.txt
