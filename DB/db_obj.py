@@ -18,7 +18,8 @@ class DbMongo:
         try:
             self.connection = MongoClient(self.ipaddress, self.port)
         except errors.ServerSelectionTimeoutError:
-            pass
+            print("catch exeption")
+            raise Exception("MongoDB is TimeOut")
 
     def close(self):
         self.connection.close()
@@ -124,6 +125,8 @@ class DbStageResults(DbMongo):
             return self.collection.find().sort("resultTimeSeconds").limit(1)[0]["resultTimeSeconds"]
         except IndexError:
             return None
+        except errors.ServerSelectionTimeoutError:
+            logging.exception(f"get_best_stage: MongoDB TIMEOUT ")
         except Exception as e:
             logging.exception(f"get_best_stage: {e}")
 
@@ -192,6 +195,7 @@ def main():
     for each in client:
         if len(each["sub_stage_cat"]):
             print(each["_id"])
+
 
 
 if __name__ == "__main__":
