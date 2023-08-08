@@ -10,7 +10,8 @@ from DB.db_obj import DbStageResults, DbSubsAtheleteClass
 from DB.models import StageSportsmanResult
 
 # import os
-import logging
+import logger.my_logger
+import logging.handlers
 import asyncio
 import get_info_api
 from aio_bot import aio_bot_functions
@@ -18,21 +19,9 @@ from aio_bot import aio_bot_functions
 API_bot = config_bot.config['API_token']
 admin_id = config_bot.config['admin_id']
 
-# Получение данных из докеркомпоза
-# BOT_TOKEN = os.environ.get("BOT_TOKEN")
-# MONGO_HOST = os.environ.get("MONGO_HOST")
-# MONGO_PORT = os.environ.get("MONGO_PORT")
-# MONGO_DB = os.environ.get("MONGO_DB")
-
-
-# задаем логирование
-logging.basicConfig(level=logging.INFO,
-                    filename="bot_log.log",
-                    filemode="w",
-                    format="%(asctime)s %(levelname)s %(message)s",
-                    datefmt="%Y-%m-%d %H:%M:%S"
-                    )
-
+logger.my_logger.init_logger("app", sh_level=10, fh_level=30)
+logger = logging.getLogger("app.app_bot_start")
+logger.info("Server is starting...")
 
 # инициализируем бота
 bot = Bot(token=API_bot, parse_mode=types.ParseMode.HTML)
@@ -78,7 +67,7 @@ async def help_bot(message: types.Message):
 @dp.message_handler(commands=["unsub"])
 async def unsubscribe_bot(message: types.Message):
     """Удаляем все подписки у пользователя"""
-    logging.info(f"User unsub - {message.from_user.id}. Delete him.")
+    logger.info(f"User unsub - {message.from_user.id}. Delete him.")
     BotInterface.unsub_tguser(message.from_user.id)
     await message.answer("Прощай друг 😿")
 
@@ -118,6 +107,7 @@ async def subscribe_results(message: types.Message):
         await bot.send_message(message.from_user.id, "Главное меню", reply_markup=nav.mainMenu)
 
     elif message.text == "Получить 🗺 этапа":
+        logger.info(f"Пришел запрос карты от {message.from_user.id}")
         try:
             if config_bot.config_gymchana_cup["trackUrl"]:
                 url = f"https://gymkhana-cup.ru/competitions/special-stage?id={config_bot.config_gymchana_cup['id_stage_now']}"
@@ -127,7 +117,7 @@ async def subscribe_results(message: types.Message):
             else:
                 await bot.send_message(message.from_user.id, " Сейчас межсезонье мэн, покатай базовую фигуру")
         except Exception as e:
-            logging.exception(f"Поймано исключение при отправке карты этапа {message.from_user.id} : -", e)
+            logger.exception(f"Поймано исключение при отправке карты этапа {message.from_user.id} : -", e)
             await message.answer("Бро, что-то пошло не так 8'(- скорее всего сервак лежит, запроси карту попозже...")
             await bot.send_message(admin_id, f'❗ Поймано исключение при отправке карты этапа от {message.from_user.id}:'
                                              f'\n {e}')
@@ -139,10 +129,6 @@ async def subscribe_results(message: types.Message):
         else:
             text = aio_bot_functions.BotFunction().make_calculate_text(b_result)
             await message.answer(text)
-
-    elif message.text == "Подписаться news":
-        await bot.send_message(message.from_user.id, "функция находится в разработке, надо немного подождать",
-                               reply_markup=nav.mainMenu)
     else:
         try:
             best_time_ms = aio_bot_functions.BotFunction().convert_to_milliseconds(message.text)
@@ -156,7 +142,7 @@ async def subscribe_results(message: types.Message):
                                      ' воспользуйся встроенным меню ;)↘ или напиши /help',
                                      reply_markup=nav.mainMenu)
         except Exception as e:
-            logging.error(f"Common error: {e}", exc_info=True)
+            logger.exception(f"Common error: {e}", exc_info=True)
             await message.answer('Братишка, не надо просто так писать,'
                                  ' воспользуйся встроенным меню ;)↘ или напиши /help',
                                  reply_markup=nav.mainMenu)
@@ -169,10 +155,10 @@ async def scheduled():
     """
     while True:
         try:
-            print("_", end='')
             await asyncio.sleep(config_bot.config_gymchana_cup["GET_TIME_OUT"])
             id_stage_now = config_bot.config_gymchana_cup["id_stage_now"]
             data_dic = get_info_api.get_sportsmans_from_ggp_stage()
+            logger.debug(f"id_stage = {id_stage_now}, timeout = {config_bot.config_gymchana_cup['GET_TIME_OUT']}")
             if not data_dic:
                 return False
             """--- New stage! ---
@@ -219,8 +205,8 @@ async def scheduled():
                         else:
                             persents = round(each["resultTimeSeconds"] / b_result * 100, 2)
                         msg_text = f" {each['athleteClass']}: {each['userFullName']} \n " \
-                                   f"{persents}% |   {each['resultTime']}\n " \
-                                   f"было: [{db_sportsman['resultTime']}] \n {each['video']} "
+                                   f"{persents}% |   {each['resultTime']}\n" \
+                                   f"было:   |   [{db_sportsman['resultTime']}] \n {each['video']} "
                         msg_text = f"💥 Улучшил время\n {msg_text}"
 
                         # Обновляем новый результат спортсмена в базе данных
@@ -234,10 +220,10 @@ async def scheduled():
                             await bot.send_message(tg_client, msg_text, disable_notification=True)
                         except BotBlocked:
                             """ Бот заблокирован, значит удаляем из подписок"""
-                            logging.info(f"Bot is blocked user - {tg_client}. Delete him.")
+                            logger.info(f"Bot is blocked user - {tg_client}. Delete him.")
                             BotInterface.unsub_tguser(tg_client)
         except Exception as e:
-            logging.exception(f"aio_bot_start: {e}")
+            logger.exception(f"aio_bot_start: {e}")
             await bot.send_message(admin_id, f"Exception {e}")
 
 
