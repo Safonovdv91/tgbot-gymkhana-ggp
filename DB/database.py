@@ -3,9 +3,11 @@ import logging
 from DB.db_obj import DbTgUsers, DbStageResults, DbSubsAtheleteClass
 from DB.models import Subscriber
 
+logger = logging.getLogger("app.DB.database")
 
 def add_stage_result(result) -> bool:
     """ Функция добавления нового результата спортсмена"""
+    logger.info(f"Добавляем результат {result}")
     client = DbStageResults()
     client.add(result)
     return result
@@ -13,6 +15,7 @@ def add_stage_result(result) -> bool:
 
 def update_stage_result(result):
     """ Функция добавления нового результата спортсмена"""
+    logger.info(f"Обновляем результат {result}")
     client = DbStageResults()
     client.del_result(result.sportsman_id)
     add_stage_result(result)
@@ -33,17 +36,10 @@ def add_subscriber(user_id: int):
     db.close()
 
 
-def update_subscriber(user_id: int, field: str, status):
-    """ Обновление статуса поля подпиcчика
-    """
-    db = DbTgUsers()
-    db.update(user_id=user_id, key=field, value=status)
-    db.close()
-
-
 def update_user_subs(user_id: int, sport_class, user_sub: str):
     """ Функция обновляющая список на какой подписан пользователь
     """
+    logger.info(f"update {user_id} : {sport_class}")
     client = DbTgUsers()
     tg_client = client.get_tg_subscriber(user_id)
     subs_athelete = DbSubsAtheleteClass()
@@ -63,8 +59,8 @@ def update_user_subs(user_id: int, sport_class, user_sub: str):
         try:
             subs_athelete.add_subscriber(user_sub, tg_subscriber.subscriber_id)     # Добавляем пользователя в рассылку
         except ValueError:
-            logging.info("Не добавили т.к. уже есть")
-        logging.info(f"New subscriber id: {tg_subscriber.subscriber_id} {sport_class}")
+            logger.info("Не добавили т.к. уже есть")
+        logger.info(f"New subscriber id: {tg_subscriber.subscriber_id} {sport_class}")
         """ --- recursion --- """
         update_user_subs(user_id, sport_class, user_sub)
         return "😸 You are welcome 😸"
@@ -77,7 +73,7 @@ def update_user_subs(user_id: int, sport_class, user_sub: str):
             try:
                 subs_athelete.remove_subscriber(user_sub, tg_subscriber.subscriber_id)
             except ValueError:
-                logging.exception("Нехуй удалять")
+                logger.error("Не удалили пользователя т.к. его нет")
             return f"Вы успешно ОТПИСАЛИСЬ от {sport_class}"
 
         else:
@@ -87,7 +83,7 @@ def update_user_subs(user_id: int, sport_class, user_sub: str):
             try:
                 subs_athelete.add_subscriber(user_sub, tg_subscriber.subscriber_id)
             except ValueError:
-                logging.info("Нечего добавлять")
+                logger.info("Не добавили такак не добавлен")
             return f"Вы успешно ПОДПИСАЛИСЬ на {sport_class}"
 
 
