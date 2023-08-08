@@ -13,3 +13,7 @@
 3) adminid
 
 Запустить docker-compose up -d
+
+или запустить bash-script -> restart-server.sh
+
+./restart-server.sh
