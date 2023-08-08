@@ -19,7 +19,7 @@ from aio_bot import aio_bot_functions
 API_bot = config_bot.config['API_token']
 admin_id = config_bot.config['admin_id']
 
-logger.my_logger.init_logger("app", 10)
+logger.my_logger.init_logger("app", sh_level=10, fh_level=30)
 logger = logging.getLogger("app.app_bot_start")
 logger.info("Server is starting...")
 
