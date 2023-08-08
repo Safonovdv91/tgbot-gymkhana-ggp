@@ -11,4 +11,5 @@
 1) API-токен
 2) BOT-токен
 3) adminid
-Запустить docker compose
+
+Запустить docker-compose up -d
