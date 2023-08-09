@@ -12,8 +12,12 @@
 2) BOT-токен
 3) adminid
 
-Запустить docker-compose up -d
+Установите докер и запустите:
+>.bash_scripts/rebuild_server.sh
+-----
+Или:
 
-или запустить bash-script -> restart-server.sh
+1) Запустить MongoDB контейнер
+2) В aio_bot/config_bot.py установить 'ip_mongo_database' и 'port_mongo_database'
+3) запустить python aio_bot_start.py
 
-./restart-server.sh
