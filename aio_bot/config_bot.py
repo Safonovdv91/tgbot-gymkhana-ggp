@@ -2,7 +2,7 @@ config = {
     "name": "GymkhanaBot",
     "API_token": "-----",
     "admin_id": "YOUR ADMIN TG ID",
-    "ip_mongo_database": "172.17.0.2",
+    "ip_mongo_database": "172.16.0.2",
     "port_mongo_database": 27017
 }
 

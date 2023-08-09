@@ -20,3 +20,4 @@
 1) Запустить MongoDB контейнер
 2) В aio_bot/config_bot.py установить 'ip_mongo_database' и 'port_mongo_database'
 3) запустить python aio_bot_start.py
+
