@@ -34,7 +34,7 @@ class BotFunction:
         return int(seconds * 1_000) + minutes * 60_000
 
     @staticmethod
-    def msec_to_mmssms(milliseconds: int):
+    def msec_to_mmssms(milliseconds: int | str):
         """ Проверка milliseconds на верный вход данных
         """
         try:
@@ -79,6 +79,30 @@ class BotInterface:
                 logging.exception(f"BotInterface: {e}")
         DbTgUsers().remove_tg_subscriber(tg_user_id)
         logging.info(f"Deleting success")
+
+
+class BotTotalizator:
+    pass
+
+
+class BetTime:
+    def __init__(self, tg_user, bet_time_ms: int | str):
+        self.tg_user = tg_user
+        self.bet_time_ms = bet_time_ms
+
+    @property
+    def bet_time_ms(self,):
+        return self._bet_time_ms
+
+    @bet_time_ms.setter
+    def bet_time_ms(self, bet_time: int):
+        try:
+            bet_time = int(bet_time)
+        except TypeError:
+            raise TypeError("Значение должно быть целым числом")
+        if bet_time <= 0:
+            raise ValueError("Значение должно быть больше нуля")
+        self._bet_time_ms = bet_time
 
 
 def main():
