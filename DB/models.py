@@ -1,3 +1,7 @@
+from dataclasses import dataclass, field
+from datetime import datetime
+
+
 class StageSubscribers:
     __athelete_classes = ("B", "C1", "C2", "C3", "D1", "D2", "D3", "D4", "N")
 
@@ -78,7 +82,7 @@ class StageSportsmanResult:
     __slots__ = ("_sportsman_id", "user_full_name", "motorcycle", "user_city", "user_country",
                  "athlete_class", "_result_time_seconds", "result_time", "_fine", "video")
 
-    def __init__(self, sportsman_id: int, userFullName, motorcycle, userCity, userCountry,
+    def __init__(self, sportsman_id: int | str, userFullName, motorcycle, userCity, userCountry,
                  athleteClass, resultTimeSeconds: int, resultTime, fine: int, video):
 
         self.sportsman_id = sportsman_id
@@ -128,3 +132,39 @@ class StageSportsmanResult:
         if value < 0:
             raise AttributeError(f"Penalty must be positive value")
         self._fine = value
+
+
+@dataclass
+class TelegramUser:
+    """ dataclass tg user. who send msg.
+    """
+    tg_id: int          # 1120145735
+    username: str       # 'novik0ff954'
+    first_name: str     # 'Pavel'
+    full_name: str      # 'Pavel Novikov'
+    language_code: str  # 'ru'
+    mention: str        # '@novik0ff954'
+
+
+@dataclass
+class BetTimeTelegramUser:
+    tg_user: TelegramUser = field(compare=False)
+    bet_time1: int
+    date_bet1: datetime = datetime.now()
+    bet_time2: int = field(default=0)
+    date_bet2: datetime = field(compare=False, default=datetime.now())
+
+    def __setattr__(self, name, value):
+        if name == 'bet_time1' and value < 0:
+            raise ValueError("bet_time1 cannot be negative")
+        if name == 'bet_time2' and value < 0:
+            raise ValueError("bet_time2 cannot be negative")
+        super().__setattr__(name, value)
+
+
+if __name__ == "__main__":
+    user1 = TelegramUser(1120145735, 'novik0ff954', 'Pavel', 'Pavel Novikov', 'ru', '@novik0ff954')
+    user2 = TelegramUser(987654321, 'johndoe', 'John', 'John Doe', 'en', '@johndoe')
+    user3 = TelegramUser(123456789, 'alice', 'Alice', 'Alice Smith', 'en', '@alice')
+    user4 = TelegramUser(555555555, 'bob', 'Bob', 'Bob Johnson', 'en', '@bob')
+    user5 = TelegramUser(999999999, 'emma', 'Emma', 'Emma Thompson', 'en', '@emma')
