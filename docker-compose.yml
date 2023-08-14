@@ -19,7 +19,7 @@ services:
     networks:
       mynetwork:
         ipv4_address: 172.16.0.3
-    command: python aio_bot_start.py
+    command: python app.py
 
 networks:
   mynetwork:

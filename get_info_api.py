@@ -30,8 +30,6 @@ def get_sportsmans_from_ggp_stage(site=SITE, api_gymkhana=API_GYMKHANA):
     # взяв ID действующего чемпионата получаем его этапы и после проходим по ним пока не найдем действующий
     get_api = requests.get(f"{site}/championships/get?signature={api_gymkhana}&id={championship_id}&type=gp")
     stages = get_api.json()["stages"]
-    logger.info("Проверяем сайт ")
-
     for stage in stages:
         # поиск действующего этапа, если его нет - значит этап не идет
         if stage["status"] in ("Приём результатов", "Подведение итогов"):
@@ -41,7 +39,6 @@ def get_sportsmans_from_ggp_stage(site=SITE, api_gymkhana=API_GYMKHANA):
             config_bot.config_gymchana_cup["GET_TIME_OUT"] = 60 * 5
             config_bot.config_gymchana_cup["id_stage_now"] = now_stage["id"]
             config_bot.config_gymchana_cup["trackUrl"] = now_stage["trackUrl"]
-            logger.info(f"Сейчас: stage[{now_stage['id']}]")
             return get_api.json()
 
     # задержка проверки результатов бота в секундах
