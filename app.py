@@ -1,6 +1,7 @@
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.types import InputFile
 from aiogram.utils.exceptions import BotBlocked
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 from aio_bot.aio_bot_functions import BotInterface
 from aio_bot import config_bot
@@ -72,6 +73,24 @@ async def unsubscribe_bot(message: types.Message):
     await message.answer("Прощай друг 😿")
 
 
+@dp.message_handler(commands=["random"])
+async def cmd_random(message: types.Message):
+    button = InlineKeyboardButton("Да", callback_data="Yes")
+    button2 = InlineKeyboardButton("Нет", callback_data="NO")
+    keyboard = InlineKeyboardMarkup()
+    keyboard.add(button)
+    keyboard.add(button2)
+    await message.answer(
+        "Нажмите на кнопку, чтобы бот отправил число от 1 до 10",
+        reply_markup=keyboard
+    )
+
+
+@dp.callback_query_handler(lambda c: c.data == 'Yes')
+async def process_callback_button(callback_query: types.CallbackQuery):
+    await callback_query.answer("Вы нажали на кнопку!")
+
+
 @dp.message_handler(commands=["bet"])
 async def betting_time(message: types.Message):
     """ Делаем ставку
@@ -96,28 +115,28 @@ async def subscribe_results(message: types.Message):
         await bot.send_message(message.from_user.id, "Выбери на какой класс подписаться",
                                reply_markup=nav.SubscriberMenu().subscriber_menu_btn(message.from_user.id))
     elif message.text in ("🟦🇧", "🔲 🇧"):
-        await message.answer(DBM.update_user_subs(message.from_user.id, "🟦🇧", "B"),
+        await message.answer(DBM.update_user_subs(message, "🟦🇧", "B"),
                              reply_markup=nav.SubscriberMenu().subscriber_menu_btn(message.from_user.id))
     elif message.text in ("🟩 С1", "🔲 С1"):
-        await message.answer(DBM.update_user_subs(message.from_user.id, "🟩 С1", "C1"),
+        await message.answer(DBM.update_user_subs(message, "🟩 С1", "C1"),
                              reply_markup=nav.SubscriberMenu().subscriber_menu_btn(message.from_user.id))
     elif message.text in ("🟩 С2", "🔲 С2"):
-        await message.answer(DBM.update_user_subs(message.from_user.id, "🟩 С2", "C2"),
+        await message.answer(DBM.update_user_subs(message, "🟩 С2", "C2"),
                              reply_markup=nav.SubscriberMenu().subscriber_menu_btn(message.from_user.id))
     elif message.text in ("🟩 С3", "🔲 С3"):
-        await message.answer(DBM.update_user_subs(message.from_user.id, "🟩 С3", "C3"),
+        await message.answer(DBM.update_user_subs(message, "🟩 С3", "C3"),
                              reply_markup=nav.SubscriberMenu().subscriber_menu_btn(message.from_user.id))
     elif message.text in ("🟨 D1", "🔲 D1"):
-        await message.answer(DBM.update_user_subs(message.from_user.id, "🟨 D1", "D1"),
+        await message.answer(DBM.update_user_subs(message, "🟨 D1", "D1"),
                              reply_markup=nav.SubscriberMenu().subscriber_menu_btn(message.from_user.id))
     elif message.text in ("🟨 D2", "🔲 D2"):
-        await message.answer(DBM.update_user_subs(message.from_user.id, "🟨 D2", "D2"),
+        await message.answer(DBM.update_user_subs(message, "🟨 D2", "D2"),
                              reply_markup=nav.SubscriberMenu().subscriber_menu_btn(message.from_user.id))
     elif message.text in ("🟨 D3", "🔲 D3"):
-        await message.answer(DBM.update_user_subs(message.from_user.id, "🟨 D3", "D3"),
+        await message.answer(DBM.update_user_subs(message, "🟨 D3", "D3"),
                              reply_markup=nav.SubscriberMenu().subscriber_menu_btn(message.from_user.id))
     elif message.text in ("🟨 D4", "🔲 D4"):
-        await message.answer(DBM.update_user_subs(message.from_user.id, "🟨 D4", "D4"),
+        await message.answer(DBM.update_user_subs(message, "🟨 D4", "D4"),
                              reply_markup=nav.SubscriberMenu().subscriber_menu_btn(message.from_user.id))
     elif message.text == "⬅ НАЗАД":
         await bot.send_message(message.from_user.id, "Главное меню", reply_markup=nav.mainMenu)
