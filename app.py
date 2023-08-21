@@ -7,7 +7,7 @@ from aio_bot import config_bot
 from aio_bot import aio_markups as nav
 from DB import database as DBM
 from DB.db_obj import DbStageResults, DbSubsAtheleteClass
-from DB.models import StageSportsmanResult
+from DB.models import StageSportsmanResult, TelegramUser
 
 # import os
 import logger.my_logger
@@ -20,7 +20,7 @@ API_bot = config_bot.config['API_token']
 admin_id = config_bot.config['admin_id']
 
 logger.my_logger.init_logger("app", sh_level=10, fh_level=30)
-logger = logging.getLogger("app.app_bot_start")
+logger = logging.getLogger("app.app")
 logger.info("Server is starting...")
 
 # инициализируем бота
@@ -70,6 +70,22 @@ async def unsubscribe_bot(message: types.Message):
     logger.info(f"User unsub - {message.from_user.id}. Delete him.")
     BotInterface.unsub_tguser(message.from_user.id)
     await message.answer("Прощай друг 😿")
+
+
+@dp.message_handler(commands=["bet"])
+async def betting_time(message: types.Message):
+    """ Делаем ставку
+    """
+    logger.info(f"Пользователь {message.from_user.full_name} сделал ставку {message.text}")
+    await message.answer(aio_bot_functions.DoBet.do_bet(message, message.text))
+
+
+@dp.message_handler(commands=["my_bet"])
+async def betting_time(message: types.Message):
+    """ Получить ставку пользователя
+    """
+    logger.info(f"Пользователь {message.from_user.full_name} запросил ставку: {message.text}")
+    await message.answer(aio_bot_functions.DoBet.get_my_bet(message))
 
 
 @dp.message_handler()
@@ -158,7 +174,7 @@ async def scheduled():
             await asyncio.sleep(config_bot.config_gymchana_cup["GET_TIME_OUT"])
             id_stage_now = config_bot.config_gymchana_cup["id_stage_now"]
             data_dic = get_info_api.get_sportsmans_from_ggp_stage()
-            logger.debug(f"id_stage = {id_stage_now}, timeout = {config_bot.config_gymchana_cup['GET_TIME_OUT']}")
+            logger.debug(f"id_stage = {id_stage_now}, timeout = {config_bot.config_gymchana_cup['GET_TIME_OUT']/ 60 } min")
             if not data_dic:
                 return False
             """--- New stage! ---
@@ -205,7 +221,7 @@ async def scheduled():
                         else:
                             persents = round(each["resultTimeSeconds"] / b_result * 100, 2)
                         msg_text = f" {each['athleteClass']}: {each['userFullName']} \n " \
-                                   f"{persents}% |   {each['resultTime']}\n" \
+                                   f"  {persents}% |   {each['resultTime']}\n" \
                                    f"было:   |   [{db_sportsman['resultTime']}] \n {each['video']} "
                         msg_text = f"💥 Улучшил время\n {msg_text}"
 

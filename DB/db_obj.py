@@ -4,7 +4,10 @@ from pymongo import MongoClient
 from pymongo import errors
 from pymongo.results import DeleteResult
 from aio_bot import config_bot
-from DB.models import StageSportsmanResult
+from DB.models import StageSportsmanResult, BetTimeTelegramUser, TelegramUser
+from dataclasses import asdict
+
+# from aio_bot.aio_bot_functions import BotFunction
 
 logger = logging.getLogger("app.DB.db_obj")
 
@@ -39,14 +42,20 @@ class DbTgUsers(DbMongo):
         current_db = self.connection[self.__db_name]
         self.collection = current_db[self.__collection_name]
 
-    def add_tg_subscriber(self, tg_user_id, subs_stage=None):
+    def add_tg_subscriber(self, tg_user: TelegramUser, subs_stage=None):
         if subs_stage is None:
             subs_stage = []
-        if self.get_tg_subscriber(tg_user_id) is None:
+        if self.get_tg_subscriber(tg_user.tg_id) is None:
             self.collection.insert_one({
-                "_id": tg_user_id,
+                "_id": tg_user.tg_id,
                 "sub_stage": False,
-                "sub_stage_cat": subs_stage
+                "sub_stage_cat": subs_stage,
+                "username": tg_user.first_name,
+                'first_name': tg_user.first_name,
+                'full_name': tg_user.full_name,
+                'language_code': tg_user.language_code,
+                'mention': tg_user.mention
+
             })
             return True
         return False
@@ -193,11 +202,75 @@ class DbSubsAtheleteClass(DbMongo):
         return True
 
 
+class DbBetTime(DbMongo):
+    DB_NAME = "ggp"
+
+    def __init__(self):
+        super().__init__()
+        self.current_db = self.connection[self.DB_NAME]
+        self.collection = self.current_db[f"bet_{config_bot.config_gymchana_cup['id_stage_now']}"]
+
+    def add(self, bet_object: BetTimeTelegramUser):
+        """ Добавление ставки в БД
+        """
+        if self.get(bet_object.tg_user.tg_id) is None:
+            logger.info(f"Ставка user:{bet_object.tg_user.tg_id} на время {bet_object.bet_time1}")
+            self.collection.insert_one(asdict(bet_object))
+            return True
+        logger.info("Ставка уже есть")
+        return None
+
+    def get(self, tg_id):
+        if tg_id == "all":
+            list_time = []
+            for each in self.collection.find():
+                list_time.append(each["bet_time1"])
+            return list_time
+        return self.collection.find_one({"tg_user.tg_id": tg_id})
+
+    def remove(self, tg_id: int):
+        return self.collection.delete_one({"tg_user.tg_id": tg_id})
+
+    def get_closest_bet(self, bet_time1: int):
+        from aio_bot.aio_bot_functions import BotFunction
+
+        ls = self.get("all")
+        closest_time = BotFunction.find_closest_number(ls, bet_time1)
+        return self.collection.find_one({"bet_time1": closest_time})
+
+
 def main():
-    client = DbTgUsers().get_all_subscribers()
-    for each in client:
-        if len(each["sub_stage_cat"]):
-            print(each["_id"])
+    # clients = DbTgUsers().get_all_subscribers()
+    # for each in clients:
+    #     if len(each["sub_stage_cat"]):
+    #         print(each["_id"])
+
+    user1 = TelegramUser(1120145735, 'novik0ff954', 'Pavel', 'Pavel Novikov', 'ru', '@novik0ff954')
+    user2 = TelegramUser(987654321, 'johndoe', 'John', 'John Doe', 'en', '@johndoe')
+    user3 = TelegramUser(123456789, 'alice', 'Alice', 'Alice Smith', 'en', '@alice')
+    user4 = TelegramUser(555555555, 'bob', 'Bob', 'Bob Johnson', 'en', '@bob')
+    user5 = TelegramUser(999999999, 'emma', 'Emma', 'Emma Thompson', 'en', '@emma')
+
+    user1_bet = BetTimeTelegramUser(user1, 65_000)
+    user2_bet = BetTimeTelegramUser(user2, 50_000)
+    user3_bet = BetTimeTelegramUser(user3, 55_000)
+    user4_bet = BetTimeTelegramUser(user4, 60_000)
+    user5_bet = BetTimeTelegramUser(user5, 45_000)
+
+    db_bet = DbBetTime()
+    db_bet.add(user1_bet)
+    db_bet.add(user2_bet)
+    db_bet.add(user3_bet)
+    db_bet.add(user4_bet)
+    db_bet.add(user5_bet)
+
+    print(f" winner - {db_bet.get_closest_bet(54204)}")
+    print("----")
+    db_bet.remove(user1_bet.tg_user.tg_id)
+    db_bet.remove(user2_bet.tg_user.tg_id)
+    db_bet.remove(user3_bet.tg_user.tg_id)
+    db_bet.remove(user4_bet.tg_user.tg_id)
+    db_bet.remove(user5_bet.tg_user.tg_id)
 
 
 if __name__ == "__main__":

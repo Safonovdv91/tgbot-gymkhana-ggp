@@ -1,7 +1,7 @@
 import logging
 
 from DB.db_obj import DbTgUsers, DbStageResults, DbSubsAtheleteClass
-from DB.models import Subscriber
+from DB.models import Subscriber, TelegramUser
 
 logger = logging.getLogger("app.DB.database")
 
@@ -36,25 +36,39 @@ def add_subscriber(user_id: int):
     db.close()
 
 
-def update_user_subs(user_id: int, sport_class, user_sub: str):
+def update_user_subs(message, sport_class, user_sub: str):
     """ Функция обновляющая список на какой подписан пользователь
     """
-    logger.info(f"update {user_id} : {sport_class}")
+    tg_user = TelegramUser(
+        message.from_user.id,
+        message.from_user.username,
+        message.from_user.first_name,
+        message.from_user.full_name,
+        message.from_user.language_code,
+        message.from_user.mention
+    )
+
+    logger.info(f"update {tg_user.tg_id} : {sport_class}")
     client = DbTgUsers()
-    tg_client = client.get_tg_subscriber(user_id)
+    tg_client = client.get_tg_subscriber(tg_user.tg_id)
+
     subs_athelete = DbSubsAtheleteClass()
 
     if tg_client is None:
         """ ебанутая логика, надо чтобы пользователь был и 2 таблицах
         ---- Add ----
         """
-        client.add_tg_subscriber(user_id)
-        tg_client = client.get_tg_subscriber(user_id)
+        client.add_tg_subscriber(tg_user)
+        tg_client = client.get_tg_subscriber(tg_user.tg_id)
+        """ 
+         продумать что юзер другого класса, либо создать общий датакласс, либо как-то объеденить их
+         или вообще переделать бизнес логику
+        """
         if tg_client is None:
-            DbTgUsers().add_tg_subscriber(user_id)
+            DbTgUsers().add_tg_subscriber(tg_user)
         tg_subscriber = Subscriber(tg_client["_id"], tg_client["sub_stage"], tg_client["sub_stage_cat"])
 
-        client.add_tg_subscriber(tg_subscriber.subscriber_id,  # добавляем во вторую таблицу
+        client.add_tg_subscriber(tg_user,  # добавляем во вторую таблицу
                                  tg_subscriber.sub_stage_categories)
         try:
             subs_athelete.add_subscriber(user_sub, tg_subscriber.subscriber_id)     # Добавляем пользователя в рассылку
@@ -62,7 +76,7 @@ def update_user_subs(user_id: int, sport_class, user_sub: str):
             logger.info("Не добавили т.к. уже есть")
         logger.info(f"New subscriber id: {tg_subscriber.subscriber_id} {sport_class}")
         """ --- recursion --- """
-        update_user_subs(user_id, sport_class, user_sub)
+        update_user_subs(message, sport_class, user_sub)
         return "😸 You are welcome 😸"
     else:
         tg_subscriber = Subscriber(tg_client["_id"], tg_client["sub_stage"], tg_client["sub_stage_cat"])
