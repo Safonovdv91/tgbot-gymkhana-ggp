@@ -42,14 +42,20 @@ class DbTgUsers(DbMongo):
         current_db = self.connection[self.__db_name]
         self.collection = current_db[self.__collection_name]
 
-    def add_tg_subscriber(self, tg_user_id, subs_stage=None):
+    def add_tg_subscriber(self, tg_user: TelegramUser, subs_stage=None):
         if subs_stage is None:
             subs_stage = []
-        if self.get_tg_subscriber(tg_user_id) is None:
+        if self.get_tg_subscriber(tg_user.tg_id) is None:
             self.collection.insert_one({
-                "_id": tg_user_id,
+                "_id": tg_user.tg_id,
                 "sub_stage": False,
-                "sub_stage_cat": subs_stage
+                "sub_stage_cat": subs_stage,
+                "username": tg_user.first_name,
+                'first_name': tg_user.first_name,
+                'full_name': tg_user.full_name,
+                'language_code': tg_user.language_code,
+                'mention': tg_user.mention
+
             })
             return True
         return False
@@ -226,6 +232,8 @@ class DbBetTime(DbMongo):
         return self.collection.delete_one({"tg_user.tg_id": tg_id})
 
     def get_closest_bet(self, bet_time1: int):
+        from aio_bot.aio_bot_functions import BotFunction
+
         ls = self.get("all")
         closest_time = BotFunction.find_closest_number(ls, bet_time1)
         return self.collection.find_one({"bet_time1": closest_time})

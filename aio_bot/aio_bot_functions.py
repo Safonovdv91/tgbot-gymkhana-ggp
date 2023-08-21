@@ -140,9 +140,8 @@ class DoBet:
         day = date.day
         h = date.hour
         m = date.minute
-        s = date.second
         msg = f"Ваша ставка на лучшее время:\n" \
-              f" {day}-{month:02d}-{year} {h}:{m} - {mmssmm}"
+              f" {year}-{month:02d}-{day} {h}:{m} - {mmssmm}"
         return msg
 
 
