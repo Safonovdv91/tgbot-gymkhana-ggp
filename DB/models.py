@@ -138,12 +138,12 @@ class StageSportsmanResult:
 class TelegramUser:
     """ dataclass tg user. who send msg.
     """
-    tg_id: int          # 1120145735
-    username: str       # 'novik0ff954'
-    first_name: str     # 'Pavel'
-    full_name: str      # 'Pavel Novikov'
-    language_code: str  # 'ru'
-    mention: str        # '@novik0ff954'
+    tg_id: int
+    username: str
+    first_name: str
+    full_name: str
+    language_code: str
+    mention: str
 
 
 @dataclass
@@ -163,8 +163,5 @@ class BetTimeTelegramUser:
 
 
 if __name__ == "__main__":
-    user1 = TelegramUser(1120145735, 'novik0ff954', 'Pavel', 'Pavel Novikov', 'ru', '@novik0ff954')
-    user2 = TelegramUser(987654321, 'johndoe', 'John', 'John Doe', 'en', '@johndoe')
-    user3 = TelegramUser(123456789, 'alice', 'Alice', 'Alice Smith', 'en', '@alice')
-    user4 = TelegramUser(555555555, 'bob', 'Bob', 'Bob Johnson', 'en', '@bob')
-    user5 = TelegramUser(999999999, 'emma', 'Emma', 'Emma Thompson', 'en', '@emma')
+    pass
+
