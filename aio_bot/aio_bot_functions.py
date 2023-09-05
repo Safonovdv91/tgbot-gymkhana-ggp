@@ -1,4 +1,6 @@
 import logging
+import os
+
 import requests
 from dataclasses import dataclass
 from typing import Any
@@ -85,8 +87,13 @@ class BotFunction:
     def download_img(url: str, name: str):
         logger.info(f"Downloading map: name = {name} | URL = {url}")
         r = requests.get(url)
-        with open(f"{name}", "wb") as f:
-            f.write(r.content)
+        try:
+            with open(f"{name}", "wb") as f:
+                f.write(r.content)
+        except FileNotFoundError:
+            logger.info("making directory image_stages")
+            os.mkdir("DB/image_stages")
+            BotFunction.download_img(url, name)     # ! Recursion !
         logger.info("Downloading success")
 
 
