@@ -7,7 +7,7 @@ from aio_bot.aio_bot_functions import BotInterface
 from aio_bot import config_bot
 from aio_bot import aio_markups as nav
 from DB import database as DBM
-from DB.db_obj import DbStageResults, DbSubsAtheleteClass
+from DB.db_obj import DbStageResults, DbSubsAtheleteClass, DbTgUsers
 from DB.models import StageSportsmanResult, TelegramUser
 
 # import os
@@ -147,7 +147,7 @@ async def subscribe_results(message: types.Message):
             if config_bot.config_gymchana_cup["trackUrl"]:
                 url = f"https://gymkhana-cup.ru/competitions/special-stage?id={config_bot.config_gymchana_cup['id_stage_now']}"
                 await bot.send_message(message.from_user.id, url)
-                photo = InputFile("DB/stage.jpg")
+                photo = InputFile(f"DB/image_stages/stage{config_bot.config_gymchana_cup['id_stage_now']}.jpg")
                 await bot.send_photo(chat_id=message.chat.id, photo=photo)
             else:
                 await bot.send_message(message.from_user.id, " Сейчас межсезонье мэн, покатай базовую фигуру")
@@ -196,17 +196,19 @@ async def scheduled():
             logger.debug(f"id_stage = {id_stage_now}, timeout = {config_bot.config_gymchana_cup['GET_TIME_OUT']/ 60 } min")
             if not data_dic:
                 return False
-            """--- New stage! ---
+            # --- New stage! ---
             if id_stage_now != config_bot.config_gymchana_cup["id_stage_now"]:
                 for each in DbTgUsers().get_all_subscribers():
                     if len(each["sub_stage_cat"]):
-                        !!! download_stage_map !!!
-                        new_stage_msg = f"Ура, начался новый этап! Надеюсь погода будет благоволить тебе ️☀️☀️," \
-                                        f" а результат вызывать восхищение 🤩! Помни что первым можно быть не только " \
-                                        f"по времени проезда!\n Но и первым кто выложит результат!😉 " \
-                                        f"{config_bot.config_gymchana_cup['trackUrl']}"
-                        await bot.send_message(each["_id"], new_stage_msg)
-            --- New stage ---"""
+                        # !!! download_stage_map !!!
+                        aio_bot_functions.BotFunction.download_img(url=data_dic["trackUrl"],
+                                                                   name=f"DB/image_stages/stage{data_dic['id']}.jpg")
+                        # new_stage_msg = f"Ура, начался новый этап! Надеюсь погода будет благоволить тебе ️☀️☀️," \
+                        #                 f" а результат вызывать восхищение 🤩! Помни что первым можно быть не только " \
+                        #                 f"по времени проезда!\n Но и первым кто выложит результат!😉 " \
+                        #                 f"{config_bot.config_gymchana_cup['trackUrl']}"
+                        # await bot.send_message(each["_id"], new_stage_msg)
+            # --- New stage ---"""
             get_results_from_stage = data_dic["results"]
             for each in get_results_from_stage:
                 b_result = DbStageResults().get_bestStage_time()
