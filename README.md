@@ -1,4 +1,5 @@
-# Telegram bot https://t.me/Gymkhana_bot
+# Telegram bot
+[@Gymkhana_bot](https://t.me/Gymkhana_bot)
 ------
 Реализация телеграмм бота созданного для отслеживания новых результатов во  
 время онлайн соревнований Gymkhana GP - удаленных соревнований по всей России.
