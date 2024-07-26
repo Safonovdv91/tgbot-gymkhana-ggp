@@ -1,6 +1,5 @@
 import random
 import unittest
-from unittest.mock import patch
 from DB.models import StageSportsmanResult
 from DB.db_obj import DbTgUsers, DbStageResults, DbSubsAtheleteClass
 from mongomock import MongoClient as MockMonkClient
@@ -66,13 +65,14 @@ class TestDbStageResults(unittest.TestCase):
             "resultTimeSeconds": "resTime",
             "resultTime": 124,
             "fine": 0,  # пенальти
-            "video": "href"
+            "video": "href",
         }
-        cls.sportsman_result = StageSportsmanResult(123, "name", "moto", "city", "count", "C1", 556, "1244", 21,
-                                                    "video")
+        cls.sportsman_result = StageSportsmanResult(
+            123, "name", "moto", "city", "count", "C1", 556, "1244", 21, "video"
+        )
 
     def test_add(self):
-        " Проверяем добавление результата"
+        "Проверяем добавление результата"
         result = self.db.add(self.sportsman_result)
         self.assertTrue(result)
 
@@ -83,23 +83,30 @@ class TestDbStageResults(unittest.TestCase):
 
         # Проверяем удаление несуществующего результата
         result = self.db.del_result(1234)
-        self.assertTrue(result)  # Удаление несуществующего результата также считается успешным
+        self.assertTrue(
+            result
+        )  # Удаление несуществующего результата также считается успешным
 
     def test_get(self):
-        " Проверяем получение существующего результата"
+        "Проверяем получение существующего результата"
         user = self.sportsman_result
         self.db.add(user)
         fx = user.sportsman_id
-        self.assertEqual(self.db.get(fx), {'_id': 123,
-                                           'athleteClass': 'C1',
-                                           'fine': 21,
-                                           'motorcycle': 'moto',
-                                           'resultTime': '1244',
-                                           'resultTimeSeconds': 556,
-                                           'userCity': 'city',
-                                           'userCountry': 'count',
-                                           'userFullName': 'name',
-                                           'video': 'video'})
+        self.assertEqual(
+            self.db.get(fx),
+            {
+                "_id": 123,
+                "athleteClass": "C1",
+                "fine": 21,
+                "motorcycle": "moto",
+                "resultTime": "1244",
+                "resultTimeSeconds": 556,
+                "userCity": "city",
+                "userCountry": "count",
+                "userFullName": "name",
+                "video": "video",
+            },
+        )
 
         # Проверяем получение несуществующего результата
         result = self.db.get(1234)
@@ -137,11 +144,17 @@ class TestDbStageBestTime(unittest.TestCase, DbStageResults):
     def testGetTrueResult(self):
         # arrange настраиваем класс, создаем тестовые данные
         client = MockMonkClient()
-        db = client['ggp']
+        db = client["ggp"]
         self.collection = db["stage_40"]
-        self.collection.insert_one({"_id": "1", "resultTimeSeconds": 100, "userFullName": "Tester1"})
-        self.collection.insert_one({"_id": "2", "resultTimeSeconds": 60, "userFullName": "Tester2"})
-        self.collection.insert_one({"_id": "3", "resultTimeSeconds": 80, "userFullName": "Tester3"})
+        self.collection.insert_one(
+            {"_id": "1", "resultTimeSeconds": 100, "userFullName": "Tester1"}
+        )
+        self.collection.insert_one(
+            {"_id": "2", "resultTimeSeconds": 60, "userFullName": "Tester2"}
+        )
+        self.collection.insert_one(
+            {"_id": "3", "resultTimeSeconds": 80, "userFullName": "Tester3"}
+        )
 
         # act производим действие
         test_col = self.get_bestStage_time()
@@ -184,6 +197,7 @@ class TestDbSubsClass(unittest.TestCase, DbSubsAtheleteClass):
         self.client.add_subscriber("A", 1)
         self.assertEqual(self.client.get_subscriber("A"), [1])
         self.client.remove_subscriber("A", 1)
+
 
 if __name__ == "__main__":
     unittest.main()
