@@ -4,7 +4,6 @@ from DB.db_obj import DbTgUsers, DbSubsAtheleteClass
 
 
 class BotFunction:
-
     @staticmethod
     def convert_to_milliseconds(mmssms: [float, str]) -> int | None | Any:
         """Метод преобразования в миллисекунды
@@ -35,8 +34,7 @@ class BotFunction:
 
     @staticmethod
     def msec_to_mmssms(milliseconds: int):
-        """ Проверка milliseconds на верный вход данных
-        """
+        """Проверка milliseconds на верный вход данных"""
         try:
             milliseconds = int(milliseconds)
         except ValueError:
@@ -48,28 +46,30 @@ class BotFunction:
         minutes, milliseconds = divmod(milliseconds, 60_000)
         seconds, milliseconds = divmod(milliseconds, 1_000)
         # Форматирование в строку в формате "минуты:секунды.миллисекунды"
-        mmssms_format: str = "{:02d}:{:02d}.{:03d}".format(minutes, seconds, milliseconds)
+        mmssms_format: str = "{:02d}:{:02d}.{:03d}".format(
+            minutes, seconds, milliseconds
+        )
         return mmssms_format
 
     def make_calculate_text(self, best_time_ms: (int, float)):
-        """ Генерируем исходящее сообщение
-        """
-        text = f'🟦 🇧: {self.msec_to_mmssms(best_time_ms)} - {self.msec_to_mmssms(best_time_ms * 1.05 - 1)} \n' \
-               f'🟩 С1: {self.msec_to_mmssms(best_time_ms * 1.05)} - {self.msec_to_mmssms(best_time_ms * 1.10 - 1)} \n' \
-               f'🟩 С2: {self.msec_to_mmssms(best_time_ms * 1.10)} - {self.msec_to_mmssms(best_time_ms * 1.15 - 1)} \n' \
-               f'🟩 С3: {self.msec_to_mmssms(best_time_ms * 1.15)} - {self.msec_to_mmssms(best_time_ms * 1.20 - 1)} \n' \
-               f'🟨 D1: {self.msec_to_mmssms(best_time_ms * 1.20)} - {self.msec_to_mmssms(best_time_ms * 1.30 - 1)} \n' \
-               f'🟨 D2: {self.msec_to_mmssms(best_time_ms * 1.30)} - {self.msec_to_mmssms(best_time_ms * 1.40 - 1)} \n' \
-               f'🟨 D3: {self.msec_to_mmssms(best_time_ms * 1.40)} - {self.msec_to_mmssms(best_time_ms * 1.50 - 1)} \n' \
-               f'🟨 D4: {self.msec_to_mmssms(best_time_ms * 1.50)} - {self.msec_to_mmssms(best_time_ms * 1.60 - 1)} '
+        """Генерируем исходящее сообщение"""
+        text = (
+            f"🟦 🇧: {self.msec_to_mmssms(best_time_ms)} - {self.msec_to_mmssms(best_time_ms * 1.05 - 1)} \n"
+            f"🟩 С1: {self.msec_to_mmssms(best_time_ms * 1.05)} - {self.msec_to_mmssms(best_time_ms * 1.10 - 1)} \n"
+            f"🟩 С2: {self.msec_to_mmssms(best_time_ms * 1.10)} - {self.msec_to_mmssms(best_time_ms * 1.15 - 1)} \n"
+            f"🟩 С3: {self.msec_to_mmssms(best_time_ms * 1.15)} - {self.msec_to_mmssms(best_time_ms * 1.20 - 1)} \n"
+            f"🟨 D1: {self.msec_to_mmssms(best_time_ms * 1.20)} - {self.msec_to_mmssms(best_time_ms * 1.30 - 1)} \n"
+            f"🟨 D2: {self.msec_to_mmssms(best_time_ms * 1.30)} - {self.msec_to_mmssms(best_time_ms * 1.40 - 1)} \n"
+            f"🟨 D3: {self.msec_to_mmssms(best_time_ms * 1.40)} - {self.msec_to_mmssms(best_time_ms * 1.50 - 1)} \n"
+            f"🟨 D4: {self.msec_to_mmssms(best_time_ms * 1.50)} - {self.msec_to_mmssms(best_time_ms * 1.60 - 1)} "
+        )
         return text
 
 
 class BotInterface:
     @staticmethod
     def unsub_tguser(tg_user_id):
-        """ Удаление подписчика из БД
-        """
+        """Удаление подписчика из БД"""
         for athelete_class in DbSubsAtheleteClass.ATHELETE_CLASSES:
             try:
                 DbSubsAtheleteClass().remove_subscriber(athelete_class, tg_user_id)
@@ -78,7 +78,7 @@ class BotInterface:
             except Exception as e:
                 logging.exception(f"BotInterface: {e}")
         DbTgUsers().remove_tg_subscriber(tg_user_id)
-        logging.info(f"Deleting success")
+        logging.info("Deleting success")
 
 
 def main():
