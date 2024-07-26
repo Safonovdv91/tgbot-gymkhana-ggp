@@ -1,6 +1,7 @@
 version: '3'
 services:
   mongodb:
+    container_name: "MG_BOT_DB"
     image: mongo
     restart: always
     volumes:
@@ -8,22 +9,20 @@ services:
     ports:
       - "27017:27017"
     networks:
-      mynetwork:
-        ipv4_address: 172.16.0.2
+      - mg_bot_net
 
   python:
+    container_name: "MG_BOT"
     restart: always
     build:
       context: .
       dockerfile: Dockerfile
+    depends_on:
+      - mongodb
     networks:
-      mynetwork:
-        ipv4_address: 172.16.0.3
-    command: python aio_bot_start.py
+      - mg_bot_net
+#    command: python app.py
 
 networks:
-  mynetwork:
-    ipam:
-      driver: default
-      config:
-        - subnet: 172.16.0.0/24
+   mg_bot_net:
+    driver: bridge
