@@ -9,8 +9,9 @@ btnStageTime = KeyboardButton(text="Получить 🕗 этапа")
 btnSubscribe = KeyboardButton(text="Подписаться")
 btnSubscribeNews = KeyboardButton(text="Подписаться news")
 
-# mainMenu = ReplyKeyboardMarkup(resize_keyboard=True).add(btnSubscribe, btnStageMap, btnStageTime)
-mainMenu = ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[[btnSubscribe, btnStageMap, btnStageTime]])
+mainMenu = ReplyKeyboardMarkup(
+    resize_keyboard=True, keyboard=[[btnSubscribe, btnStageMap, btnStageTime]]
+)
 
 # --- Subscribe Menu ---
 sub_A = KeyboardButton(text="🟥 🅰️")
@@ -33,9 +34,14 @@ unsub_D2 = KeyboardButton(text="🔲 D2")
 unsub_D3 = KeyboardButton(text="🔲 D3")
 unsub_D4 = KeyboardButton(text="🔲 D4")
 
-subscribeMenu = ReplyKeyboardMarkup(resize_keyboard=True,
-                                    keyboard=[[sub_A, unsub_B], [unsub_C1, unsub_C2, sub_C3], [sub_D1, sub_D2,
-                                                                                      sub_D3, sub_D4, btnBackToMenu]])
+subscribeMenu = ReplyKeyboardMarkup(
+    resize_keyboard=True,
+    keyboard=[
+        [sub_A, unsub_B],
+        [unsub_C1, unsub_C2, sub_C3],
+        [sub_D1, sub_D2, sub_D3, sub_D4, btnBackToMenu],
+    ],
+)
 
 
 class SubscriberMenu:
@@ -54,11 +60,9 @@ class SubscriberMenu:
         D4 = sub_D4 if "D4" in subs_ls else unsub_D4
         return ReplyKeyboardMarkup(
             resize_keyboard=True,
-            keyboard=[[A,B],
-                [C1,C2,C3],
-                [D1,D2,D3,D4],
-                [btnBackToMenu]]
+            keyboard=[[A, B], [C1, C2, C3], [D1, D2, D3, D4], [btnBackToMenu]],
         )
+
 
 # --- Subscribe to news ---
 
