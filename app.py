@@ -1,11 +1,6 @@
+from aiogram import exceptions
 from aiogram import Bot, Dispatcher
-from aiogram.filters import CommandStart, Command
-from aiogram.types import InputFile
-# from aiogram.utils.exceptions import BotBlocked
-
-from aio_bot.aio_bot_functions import BotInterface
 from aio_bot import config_bot
-# from aio_bot import aio_markups as nav
 from DB import database as DBM
 from DB.db_obj import DbStageResults, DbSubsAtheleteClass
 from DB.models import StageSportsmanResult
@@ -15,11 +10,11 @@ import logger.my_logger
 import logging.handlers
 import asyncio
 import get_info_api
+from aio_bot.aio_bot_functions import BotInterface
 from app.handlers import router
-from aio_bot import aio_bot_functions
 
-API_bot = config_bot.config['API_token']
-admin_id = config_bot.config['admin_id']
+API_bot = config_bot.config["API_token"]
+admin_id = config_bot.config["admin_id"]
 
 logger.my_logger.init_logger("app", sh_level=10, fh_level=30)
 logger = logging.getLogger("app")
@@ -33,15 +28,16 @@ dp = Dispatcher()
 #
 # --- Периодическое обновление участников этапа ---
 async def scheduled():
-    """ Запланированная периодическая задача отвечающая за сравнение и раcсылку новых результатов
-    """
+    """Запланированная периодическая задача отвечающая за сравнение и раcсылку новых результатов"""
     while True:
         try:
             logger.info("Тик бота")
             await asyncio.sleep(config_bot.config_gymchana_cup["GET_TIME_OUT"])
-            id_stage_now = config_bot.config_gymchana_cup["id_stage_now"]
             data_dic = get_info_api.get_sportsmans_from_ggp_stage()
-            logger.debug(f"id_stage = {id_stage_now}, timeout = {config_bot.config_gymchana_cup['GET_TIME_OUT']}")
+            logger.debug(
+                f"id_stage = {config_bot.config_gymchana_cup["id_stage_now"]},"
+                f" timeout = {config_bot.config_gymchana_cup['GET_TIME_OUT']}"
+            )
             if not data_dic:
                 return False
             """--- New stage! ---
@@ -59,13 +55,18 @@ async def scheduled():
             for each in get_results_from_stage:
                 b_result = DbStageResults().get_bestStage_time()
                 msg_text = False
-                sportsman_result = StageSportsmanResult(each["userId"], each["userFullName"],
-                                                        each["motorcycle"],
-                                                        each["userCity"], each["userCountry"],
-                                                        each["athleteClass"],
-                                                        each["resultTimeSeconds"], each["resultTime"],
-                                                        each["fine"],
-                                                        each["video"])
+                sportsman_result = StageSportsmanResult(
+                    each["userId"],
+                    each["userFullName"],
+                    each["motorcycle"],
+                    each["userCity"],
+                    each["userCountry"],
+                    each["athleteClass"],
+                    each["resultTimeSeconds"],
+                    each["resultTime"],
+                    each["fine"],
+                    each["video"],
+                )
 
                 db_sportsman = DBM.find_one_sportsman_from_stage(each["userId"])
                 if db_sportsman is None:
@@ -73,9 +74,11 @@ async def scheduled():
                         persents = 100
                     else:
                         persents = round(each["resultTimeSeconds"] / b_result * 100, 2)
-                    msg_text = f" {each['athleteClass']}: {each['userFullName']} \n " \
-                               f"{persents}% |   {each['resultTime']}\n" \
-                               f"{each['video']}"
+                    msg_text = (
+                        f" {each['athleteClass']}: {each['userFullName']} \n "
+                        f"{persents}% |   {each['resultTime']}\n"
+                        f"{each['video']}"
+                    )
                     msg_text = f"⚡ Новый результат\n{msg_text}"
 
                     # Добавляем новый результат спортсмена в базу данных
@@ -86,10 +89,14 @@ async def scheduled():
                         if b_result is None:
                             persents = 100
                         else:
-                            persents = round(each["resultTimeSeconds"] / b_result * 100, 2)
-                        msg_text = f" {each['athleteClass']}: {each['userFullName']} \n " \
-                                   f"{persents}% |   {each['resultTime']}\n" \
-                                   f"было:   |   [{db_sportsman['resultTime']}] \n {each['video']} "
+                            persents = round(
+                                each["resultTimeSeconds"] / b_result * 100, 2
+                            )
+                        msg_text = (
+                            f" {each['athleteClass']}: {each['userFullName']} \n "
+                            f"{persents}% |   {each['resultTime']}\n"
+                            f"было:   |   [{db_sportsman['resultTime']}] \n {each['video']} "
+                        )
                         msg_text = f"💥 Улучшил время\n {msg_text}"
 
                         # Обновляем новый результат спортсмена в базе данных
@@ -97,15 +104,23 @@ async def scheduled():
 
                 # Раcсылаем сообщения
                 if msg_text:
-                    tg_clients = DbSubsAtheleteClass().get_subscriber(each["athleteClass"])
+                    tg_clients = DbSubsAtheleteClass().get_subscriber(
+                        each["athleteClass"]
+                    )
                     for tg_client in tg_clients:
                         try:
-                            await bot.send_message(tg_client, msg_text, disable_notification=True)
-                        except Exception:
+                            await bot.send_message(
+                                tg_client, msg_text, disable_notification=True
+                            )
+
+                        except exceptions.TelegramBadRequest:
                             """ Бот заблокирован, значит удаляем из подписок"""
-                            logger.info(f"Bot is blocked user - {tg_client}. Delete him.")
-                            logger.exception(f"Поймано исключение {e}")
-                            # BotInterface.unsub_tguser(tg_client)
+                            logger.info(
+                                f"Bot is blocked user - {tg_client}. Delete him."
+                            )
+                            BotInterface.unsub_tguser(tg_client)
+                        except Exception as e:
+                            logger.exception(f"Поймано исключение: {e}")
         except Exception as e:
             logger.exception(f"aio_bot_start: {e}")
             await bot.send_message(admin_id, f"Exception {e}")
@@ -115,6 +130,7 @@ async def scheduled():
 async def main():
     logger.info("Запускаем бота")
     dp.include_router(router)
+    asyncio.create_task(scheduled())  # Запуск периодической задачи
     await dp.start_polling(bot)
 
 
