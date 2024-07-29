@@ -1,0 +1,14 @@
+debug: true
+admin:
+  telegram_id: telegram_admin_id
+database:
+  host:
+  port:
+bot:
+  name: bot_name
+  API_token: bot_token
+gymkhana_cup:
+  "site": https://api.mg-cup.ru/
+  "API": api_site
+  "GET_TIME_OUT": 5
+  "best_time": None
