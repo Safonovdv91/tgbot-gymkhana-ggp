@@ -19,7 +19,6 @@ admin_id = config_bot.config["admin_id"]
 logger.my_logger.init_logger("app", sh_level=10, fh_level=30)
 logger = logging.getLogger("app")
 logger.info("Server is starting...")
-
 # инициализируем бота
 bot = Bot(token=API_bot)
 dp = Dispatcher()
@@ -34,12 +33,9 @@ async def scheduled():
             logger.info("Тик бота")
             await asyncio.sleep(config_bot.config_gymchana_cup["GET_TIME_OUT"])
             data_dic = get_info_api.get_sportsmans_from_ggp_stage()
-            logger.debug(
-                f"id_stage = {config_bot.config_gymchana_cup["id_stage_now"]},"
-                f" timeout = {config_bot.config_gymchana_cup['GET_TIME_OUT']}"
-            )
+            logger.debug(f" timeout = {config_bot.config_gymchana_cup['GET_TIME_OUT']}")
             if not data_dic:
-                return False
+                continue
             """--- New stage! ---
             if id_stage_now != config_bot.config_gymchana_cup["id_stage_now"]:
                 for each in DbTgUsers().get_all_subscribers():
@@ -52,6 +48,7 @@ async def scheduled():
                         await bot.send_message(each["_id"], new_stage_msg)
             --- New stage ---"""
             get_results_from_stage = data_dic["results"]
+
             for each in get_results_from_stage:
                 b_result = DbStageResults().get_bestStage_time()
                 msg_text = False
@@ -69,6 +66,7 @@ async def scheduled():
                 )
 
                 db_sportsman = DBM.find_one_sportsman_from_stage(each["userId"])
+
                 if db_sportsman is None:
                     if b_result is None:
                         persents = 100
@@ -92,13 +90,13 @@ async def scheduled():
                             persents = round(
                                 each["resultTimeSeconds"] / b_result * 100, 2
                             )
+
                         msg_text = (
                             f" {each['athleteClass']}: {each['userFullName']} \n "
                             f"{persents}% |   {each['resultTime']}\n"
                             f"было:   |   [{db_sportsman['resultTime']}] \n {each['video']} "
                         )
                         msg_text = f"💥 Улучшил время\n {msg_text}"
-
                         # Обновляем новый результат спортсмена в базе данных
                         DBM.update_stage_result(sportsman_result)
 
@@ -107,6 +105,7 @@ async def scheduled():
                     tg_clients = DbSubsAtheleteClass().get_subscriber(
                         each["athleteClass"]
                     )
+
                     for tg_client in tg_clients:
                         try:
                             await bot.send_message(

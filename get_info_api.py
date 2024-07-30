@@ -39,7 +39,10 @@ def get_sportsmans_from_ggp_stage(site=SITE, api_gymkhana=API_GYMKHANA):
 
     for stage in stages:
         # поиск действующего этапа, если его нет - значит этап не идет
-        if stage["status"] in ("Приём результатов", "Подведение итогов"):
+        if stage["status"] in (
+            "Приём результатов",
+            "Подведение итогов",
+        ):
             now_stage = stage
             get_api = requests.get(
                 f"{site}/stages/get?signature={api_gymkhana}&id={now_stage['id']}&type=gp"

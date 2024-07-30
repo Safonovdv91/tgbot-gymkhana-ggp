@@ -1,7 +1,6 @@
 from aiogram import Router, types
 from aio_bot import aio_markups as nav
 from aiogram.filters import CommandStart, Command
-from aiogram.types import InputFile
 
 from aio_bot.aio_bot_functions import BotInterface
 from aio_bot import config_bot
@@ -125,10 +124,10 @@ async def subscribe_results(message: types.Message):
         logger.info(f"Пришел запрос карты от {message.from_user.id}")
         try:
             if config_bot.config_gymchana_cup["trackUrl"]:
-
+                track_url = f"https://gymkhana-cup.ru/competitions/special-stage?id={config_bot.config_gymchana_cup['id_stage_now']}"
                 await message.answer_photo(
-                    photo=config_bot.config_gymchana_cup["trackUrl"],
-                    сaption=f"https://gymkhana-cup.ru/competitions/special-stage?id={config_bot.config_gymchana_cup['id_stage_now']}")
+                    photo=config_bot.config_gymchana_cup["trackUrl"], caption=track_url
+                )
             else:
                 await message.answer(" Сейчас межсезонье мэн, покатай базовую фигуру")
         except Exception as e:
