@@ -12,3 +12,4 @@ gymkhana_cup:
   "API": api_site
   "GET_TIME_OUT": 5
   "best_time": None
+  "trackUrl": None

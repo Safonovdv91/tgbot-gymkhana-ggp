@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
 import yaml
+import logging
 
 
 @dataclass
@@ -21,8 +22,8 @@ class DatabaseConfig:
     password: str = "postgres"
     database: str = "project"
 
-config_path = "etc/config.yaml"
-with open(config_path, "r") as f:
+
+with open("etc/config.yaml", "r") as f:
     raw_config = yaml.safe_load(f)
 
 db_config = DatabaseConfig(
@@ -42,10 +43,6 @@ config_gymchana_cup = {
     "site":  raw_config["gymkhana_cup"]["site"],
     "API": raw_config["gymkhana_cup"]["API"],
     "GET_TIME_OUT": raw_config["gymkhana_cup"]["GET_TIME_OUT"],
-    "id_stage_now": 30,
+    "trackUrl": raw_config["gymkhana_cup"]["trackUrl"],
     "best_time": None
 }
-
-print(config_gymchana_cup)
-
-

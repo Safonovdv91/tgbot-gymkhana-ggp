@@ -53,13 +53,7 @@ def get_sportsmans_from_ggp_stage(site=SITE, api_gymkhana=API_GYMKHANA):
 
     # задержка проверки результатов бота в секундах
     logger.info("Сейчас нет приема результатов, устанавливаем повышенный таймаут")
+    config_bot.config_gymchana_cup["trackUrl"] = None
     config_bot.config_gymchana_cup["GET_TIME_OUT"] = 60 * 60 * 3
-    logger.info(f"Таймаут = {config_bot.config_gymchana_cup['GET_TIME_OUT']}")
+    logger.info(f"Таймаут = {config_bot.config_gymchana_cup['GET_TIME_OUT']}с")
     config_bot.config_gymchana_cup["trackUrl"] = False
-    return False
-
-
-if __name__ == "__main__":
-    get_sportsmans_from_ggp_stage()
-    print(get_sportsmans_from_ggp_stage())
-    print(f"Сейчас идет {get_sportsmans_from_ggp_stage()}")

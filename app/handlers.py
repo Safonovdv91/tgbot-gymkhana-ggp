@@ -125,10 +125,10 @@ async def subscribe_results(message: types.Message):
         logger.info(f"Пришел запрос карты от {message.from_user.id}")
         try:
             if config_bot.config_gymchana_cup["trackUrl"]:
-                url = f"https://gymkhana-cup.ru/competitions/special-stage?id={config_bot.config_gymchana_cup['id_stage_now']}"
-                await message.answer(url)
-                photo = InputFile("DB/stage.jpg")
-                await message.answer(photo=photo)
+
+                await message.answer_photo(
+                    photo=config_bot.config_gymchana_cup["trackUrl"],
+                    сaption=f"https://gymkhana-cup.ru/competitions/special-stage?id={config_bot.config_gymchana_cup['id_stage_now']}")
             else:
                 await message.answer(" Сейчас межсезонье мэн, покатай базовую фигуру")
         except Exception as e:
@@ -143,6 +143,9 @@ async def subscribe_results(message: types.Message):
             #                                  f'\n {e}')
 
     elif message.text == "Получить 🕗 этапа":
+        if config_bot.config_gymchana_cup["trackUrl"] is False:
+            await message.answer("На данный момент ещё нет ни одного результата")
+            return
         b_result = DbStageResults().get_bestStage_time()
         if b_result is None:
             await message.answer("На данный момент ещё нет ни одного результата")
