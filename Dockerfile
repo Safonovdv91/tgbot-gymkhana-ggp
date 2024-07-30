@@ -37,5 +37,3 @@ RUN poetry install --no-root
 
 # Creating folders, and files for a project:
 COPY . .
-
-RUN python app.py
