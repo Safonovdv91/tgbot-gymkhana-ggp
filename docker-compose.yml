@@ -21,7 +21,7 @@ services:
       - mongodb
     networks:
       - mg_bot_net
-#    command: python app.py
+    command: python app.py
 
 networks:
    mg_bot_net:
