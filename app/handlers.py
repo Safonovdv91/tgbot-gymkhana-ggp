@@ -74,54 +74,56 @@ async def subscribe_results(message: types.Message):
         )
     elif message.text in ("🟥 🅰️", "🔲 🅰️"):
         await message.answer(
-            DBM.update_user_subs(message.from_user.id, "🟥A", "A"),
+            DBM.update_user_subs(message, "🟥A", "A"),
             reply_markup=nav.SubscriberMenu().subscriber_menu_btn(message.from_user.id),
         )
     elif message.text in ("🟦 🇧", "🔲 🇧"):
         await message.answer(
-            DBM.update_user_subs(message.from_user.id, "🟦🇧", "B"),
+            DBM.update_user_subs(message, "🟦🇧", "B"),
             reply_markup=nav.SubscriberMenu().subscriber_menu_btn(message.from_user.id),
         )
     elif message.text in ("🟩 С1", "🔲 С1"):
         await message.answer(
-            DBM.update_user_subs(message.from_user.id, "🟩 С1", "C1"),
+            DBM.update_user_subs(message, "🟩 С1", "C1"),
             reply_markup=nav.SubscriberMenu().subscriber_menu_btn(message.from_user.id),
         )
     elif message.text in ("🟩 С2", "🔲 С2"):
         await message.answer(
-            DBM.update_user_subs(message.from_user.id, "🟩 С2", "C2"),
+            DBM.update_user_subs(message, "🟩 С2", "C2"),
             reply_markup=nav.SubscriberMenu().subscriber_menu_btn(message.from_user.id),
         )
     elif message.text in ("🟩 С3", "🔲 С3"):
         await message.answer(
-            DBM.update_user_subs(message.from_user.id, "🟩 С3", "C3"),
+            DBM.update_user_subs(message, "🟩 С3", "C3"),
             reply_markup=nav.SubscriberMenu().subscriber_menu_btn(message.from_user.id),
         )
     elif message.text in ("🟨 D1", "🔲 D1"):
         await message.answer(
-            DBM.update_user_subs(message.from_user.id, "🟨 D1", "D1"),
+            DBM.update_user_subs(message, "🟨 D1", "D1"),
             reply_markup=nav.SubscriberMenu().subscriber_menu_btn(message.from_user.id),
         )
     elif message.text in ("🟨 D2", "🔲 D2"):
         await message.answer(
-            DBM.update_user_subs(message.from_user.id, "🟨 D2", "D2"),
+            DBM.update_user_subs(message, "🟨 D2", "D2"),
             reply_markup=nav.SubscriberMenu().subscriber_menu_btn(message.from_user.id),
         )
     elif message.text in ("🟨 D3", "🔲 D3"):
         await message.answer(
-            DBM.update_user_subs(message.from_user.id, "🟨 D3", "D3"),
+            DBM.update_user_subs(message, "🟨 D3", "D3"),
             reply_markup=nav.SubscriberMenu().subscriber_menu_btn(message.from_user.id),
         )
     elif message.text in ("🟨 D4", "🔲 D4"):
         await message.answer(
-            DBM.update_user_subs(message.from_user.id, "🟨 D4", "D4"),
+            DBM.update_user_subs(message, "🟨 D4", "D4"),
             reply_markup=nav.SubscriberMenu().subscriber_menu_btn(message.from_user.id),
         )
     elif message.text == "⬅ НАЗАД":
         await message.answer("Главное меню", reply_markup=nav.mainMenu)
 
     elif message.text == "Получить 🗺 этапа":
-        logger.info(f"Пришел запрос карты от {message.from_user.id}")
+        logger.info(
+            f"Пришел запрос карты от [{message.from_user.full_name}]:{message.from_user.id}"
+        )
         try:
             if config_bot.config_gymchana_cup["trackUrl"]:
                 track_url = f"https://gymkhana-cup.ru/competitions/special-stage?id={config_bot.config_gymchana_cup['id_stage_now']}"
