@@ -29,22 +29,14 @@ def find_one_sportsman_from_stage(user_id: int):
     return db_client.get(user_id)
 
 
-def add_subscriber(user_id: int):
-    """Добавление пользователя бота в базу данных со стандартными данными"""
-    db = DbTgUsers()
-    db.add_tg_subscriber(user_id)
-    db.close()
-
 def update_user_subs(message, sport_class, user_sub: str):
-    """ Функция обновляющая список на какой подписан пользователь
-    """
+    """Функция обновляющая список на какой подписан пользователь"""
     tg_user = TelegramUser(
         message.from_user.id,
         message.from_user.username,
         message.from_user.first_name,
         message.from_user.full_name,
         message.from_user.language_code,
-        message.from_user.mention
     )
 
     logger.info(f"update {tg_user.tg_id} : {sport_class}")
@@ -64,12 +56,15 @@ def update_user_subs(message, sport_class, user_sub: str):
          или вообще переделать бизнес логику
         """
         if tg_client is None:
-
             DbTgUsers().add_tg_subscriber(tg_user)
-        tg_subscriber = Subscriber(tg_client["_id"], tg_client["sub_stage"], tg_client["sub_stage_cat"])
+        tg_subscriber = Subscriber(
+            tg_client["_id"], tg_client["sub_stage"], tg_client["sub_stage_cat"]
+        )
 
-        client.add_tg_subscriber(tg_user,  # добавляем во вторую таблицу
-                                 tg_subscriber.sub_stage_categories)
+        client.add_tg_subscriber(
+            tg_user,  # добавляем во вторую таблицу
+            tg_subscriber.sub_stage_categories,
+        )
         try:
             subs_athelete.add_subscriber(
                 user_sub, tg_subscriber.subscriber_id
