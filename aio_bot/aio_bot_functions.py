@@ -41,8 +41,7 @@ class BotFunction:
 
     @staticmethod
     def msec_to_mmssms(milliseconds: int | str):
-        """ Проверка milliseconds на верный вход данных
-        """
+        """Проверка milliseconds на верный вход данных"""
         try:
             milliseconds = int(milliseconds)
         except ValueError:
@@ -76,10 +75,14 @@ class BotFunction:
     @staticmethod
     def find_closest_number(numbers, bet):
         closest_number = None
-        min_difference = float('inf')  # Инициализируем минимальную разницу как бесконечность
+        min_difference = float(
+            "inf"
+        )  # Инициализируем минимальную разницу как бесконечность
 
         for number in numbers:
-            difference = abs(number - bet)  # Вычисляем разницу между числом из списка и bet
+            difference = abs(
+                number - bet
+            )  # Вычисляем разницу между числом из списка и bet
             if difference < min_difference:
                 min_difference = difference
                 closest_number = number
@@ -95,7 +98,7 @@ class BotFunction:
         except FileNotFoundError:
             logger.info("making directory image_stages")
             os.mkdir("DB/image_stages")
-            BotFunction.download_img(url, name)     # ! Recursion !
+            BotFunction.download_img(url, name)  # ! Recursion !
         logger.info("Downloading success")
 
 
@@ -119,7 +122,6 @@ class BotTotalizator:
 
 
 class DoBet:
-
     @staticmethod
     def do_bet(message, time):
         tg_user = TelegramUser(
@@ -128,18 +130,17 @@ class DoBet:
             message.from_user.first_name,
             message.from_user.full_name,
             message.from_user.language_code,
-            message.from_user.mention
+            message.from_user.mention,
         )
         try:
             time_ms = BotFunction.convert_to_milliseconds(time[4:])
             bet_ss = BetTimeTelegramUser(tg_user, time_ms)
         except (TypeError, ValueError):
-            msg = "Пришли сообщение в формате:\n" \
-                  "/bet 01:02.563 или /bet 42.563"
+            msg = "Пришли сообщение в формате:\n" "/bet 01:02.563 или /bet 42.563"
             return msg
 
         if DbBetTime().add(bet_ss) is None:
-            msg = f"А всё, ставка уже принята"
+            msg = "А всё, ставка уже принята"
             msg = f"{msg}\n {DoBet.get_my_bet(message)}"
             return msg
         mmssmm = BotFunction.msec_to_mmssms(time_ms)
@@ -150,17 +151,21 @@ class DoBet:
     def get_my_bet(message):
         db_object = DbBetTime().get(message.from_user.id)
         if db_object is None:
-            return "Вы ещё не сделали ставку, чтобы её сделать напиши /bet ваше время\n" \
-                   "например: /bet 45.38, /bet 1:07.13 "
-        mmssmm = BotFunction.msec_to_mmssms(db_object['bet_time1'])
-        date = db_object['date_bet1']
+            return (
+                "Вы ещё не сделали ставку, чтобы её сделать напиши /bet ваше время\n"
+                "например: /bet 45.38, /bet 1:07.13 "
+            )
+        mmssmm = BotFunction.msec_to_mmssms(db_object["bet_time1"])
+        date = db_object["date_bet1"]
         year = date.year
         month = date.month
         day = date.day
         h = date.hour
         m = date.minute
-        msg = f"Ваша ставка на лучшее время:\n" \
-              f" {year}-{month:02d}-{day} {h}:{m} - {mmssmm}"
+        msg = (
+            f"Ваша ставка на лучшее время:\n"
+            f" {year}-{month:02d}-{day} {h}:{m} - {mmssmm}"
+        )
         return msg
 
 
@@ -170,7 +175,9 @@ class BetTime:
         self.bet_time_ms = bet_time_ms
 
     @property
-    def bet_time_ms(self, ):
+    def bet_time_ms(
+        self,
+    ):
         return self._bet_time_ms
 
     @bet_time_ms.setter
