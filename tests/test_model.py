@@ -3,12 +3,32 @@ from DB.models import Subscriber, StageSubscribers, StageSportsmanResult
 
 
 class TestModelSportsmanStage(unittest.TestCase):
-    test_result = StageSportsmanResult(123, "Pavukov", "Raptor", "Smolensk",
-                                       "Russia", "C2", 66666, "01:01.66", 666, "https:/666.com")
+    test_result = StageSportsmanResult(
+        123,
+        "Pavukov",
+        "Raptor",
+        "Smolensk",
+        "Russia",
+        "C2",
+        66666,
+        "01:01.66",
+        666,
+        "https:/666.com",
+    )
 
     def test_good_setter(self):
-        test_result = StageSportsmanResult(123, "Pavukov", "Raptor", "Smolensk",
-                                           "Russia", "C2", 66666, "01:01.66", 666,  "https:/666.com")
+        test_result = StageSportsmanResult(
+            123,
+            "Pavukov",
+            "Raptor",
+            "Smolensk",
+            "Russia",
+            "C2",
+            66666,
+            "01:01.66",
+            666,
+            "https:/666.com",
+        )
 
         self.assertEqual(test_result.sportsman_id, 123)
         self.assertEqual(test_result.user_full_name, "Pavukov")
@@ -22,56 +42,126 @@ class TestModelSportsmanStage(unittest.TestCase):
         self.assertEqual(test_result.video, "https:/666.com")
 
     def test_raise_bad_id(self):
-        " Плохой id"
-        test_result = StageSportsmanResult(123, "Pavukov", "Raptor", "Smolensk",
-                                           "Russia", "C2", 66666, "01:01.66", 666,  "https:/666.com")
+        "Плохой id"
+        test_result = StageSportsmanResult(
+            123,
+            "Pavukov",
+            "Raptor",
+            "Smolensk",
+            "Russia",
+            "C2",
+            66666,
+            "01:01.66",
+            666,
+            "https:/666.com",
+        )
         with self.assertRaises(TypeError):
             test_result.sportsman_id = "123"
 
         with self.assertRaises(TypeError):
-            test_result = StageSportsmanResult("123", "Pavukov", "Raptor", "Smolensk",
-                                               "Russia", "C2", 66666, "01:01.66", 666, "https:/666.com")
+            test_result = StageSportsmanResult(
+                "123",
+                "Pavukov",
+                "Raptor",
+                "Smolensk",
+                "Russia",
+                "C2",
+                66666,
+                "01:01.66",
+                666,
+                "https:/666.com",
+            )
         with self.assertRaises(AttributeError):
             test_result.sportsman_id = -66666
 
         with self.assertRaises(AttributeError):
-            test_result = StageSportsmanResult(-112, "Pavukov", "Raptor", "Smolensk",
-                                               "Russia", "C2", 66666, "01:01.66", 666, "https:/666.com")
+            test_result = StageSportsmanResult(
+                -112,
+                "Pavukov",
+                "Raptor",
+                "Smolensk",
+                "Russia",
+                "C2",
+                66666,
+                "01:01.66",
+                666,
+                "https:/666.com",
+            )
 
     def test_raise_bad_time(self):
-        " Плохое время"
+        "Плохое время"
         test_result = self.test_result
 
         with self.assertRaises(TypeError):
             test_result.result_time_seconds = "66666"
 
         with self.assertRaises(TypeError):
-            test_result = StageSportsmanResult(123, "Pavukov", "Raptor", "Smolensk",
-                                               "Russia", "C2", "66666", "01:01.66", 666, "https:/666.com")
+            test_result = StageSportsmanResult(
+                123,
+                "Pavukov",
+                "Raptor",
+                "Smolensk",
+                "Russia",
+                "C2",
+                "66666",
+                "01:01.66",
+                666,
+                "https:/666.com",
+            )
         with self.assertRaises(AttributeError):
             test_result.result_time_seconds = -66666
 
         with self.assertRaises(AttributeError):
-            test_result = StageSportsmanResult(123, "Pavukov", "Raptor", "Smolensk",
-                                               "Russia", "C2", -66666, "01:01.66", 666, "https:/666.com")
+            test_result = StageSportsmanResult(
+                123,
+                "Pavukov",
+                "Raptor",
+                "Smolensk",
+                "Russia",
+                "C2",
+                -66666,
+                "01:01.66",
+                666,
+                "https:/666.com",
+            )
 
     def test_raise_bad_fine(self):
-        " Не цифра пенальти"
+        "Не цифра пенальти"
         test_result = self.test_result
 
         with self.assertRaises(TypeError):
             test_result.result_time_seconds = "666"
 
         with self.assertRaises(TypeError):
-            test_result = StageSportsmanResult("123", "Pavukov", "Raptor", "Smolensk",
-                                               "Russia", "C2", 66666, "01:01.66", "666", "https:/666.com")
+            test_result = StageSportsmanResult(
+                "123",
+                "Pavukov",
+                "Raptor",
+                "Smolensk",
+                "Russia",
+                "C2",
+                66666,
+                "01:01.66",
+                "666",
+                "https:/666.com",
+            )
 
         with self.assertRaises(AttributeError):
             test_result.fine = -66666
 
         with self.assertRaises(AttributeError):
-            test_result = StageSportsmanResult(123, "Pavukov", "Raptor", "Smolensk",
-                                               "Russia", "C2", 66666, "01:01.66", -666, "https:/666.com")
+            test_result = StageSportsmanResult(
+                123,
+                "Pavukov",
+                "Raptor",
+                "Smolensk",
+                "Russia",
+                "C2",
+                66666,
+                "01:01.66",
+                -666,
+                "https:/666.com",
+            )
 
 
 class TestModelSubscriber(unittest.TestCase):
@@ -103,7 +193,6 @@ class TestModelSubscriber(unittest.TestCase):
 
 
 class TestStageSubscribers(unittest.TestCase):
-
     def test_create_athelete_class(self):
         test_stage = StageSubscribers("C1", {124512})
 
@@ -137,7 +226,10 @@ class TestStageSubscribers(unittest.TestCase):
     def test_add_new_subscriber_LongId(self):
         test_stage = StageSubscribers("C1", {12345123451234512345})
         test_stage.add_subscriber(11122222222414124152412312312312512)
-        self.assertEqual(test_stage.subscribers_id, {12345123451234512345, 11122222222414124152412312312312512})
+        self.assertEqual(
+            test_stage.subscribers_id,
+            {12345123451234512345, 11122222222414124152412312312312512},
+        )
 
     def test_remove_subscriber(self):
         test_stage = StageSubscribers("C1", {12345})
@@ -152,4 +244,3 @@ class TestStageSubscribers(unittest.TestCase):
         test_stage = StageSubscribers("C1", {12345})
         with self.assertRaises(AttributeError):
             test_stage.removed_subscriber(124151)
-

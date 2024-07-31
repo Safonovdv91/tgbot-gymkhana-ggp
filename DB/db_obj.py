@@ -16,6 +16,7 @@ class DbMongo:
     """
     Класс работы и подключения к базе данных MONGO
     """
+
     ipaddress = config_bot.config["ip_mongo_database"]
     port = config_bot.config["port_mongo_database"]
 
@@ -34,6 +35,7 @@ class DbTgUsers(DbMongo):
     """
     Класс работы с базой данных телеграмм подписчиков
     """
+
     __db_name = "users_bot"
     __collection_name = "users"
 
@@ -45,6 +47,7 @@ class DbTgUsers(DbMongo):
     def add_tg_subscriber(self, tg_user: TelegramUser, subs_stage=None):
         if subs_stage is None:
             subs_stage = []
+
         if self.get_tg_subscriber(tg_user.tg_id) is None:
             self.collection.insert_one({
                 "_id": tg_user.tg_id,
@@ -57,6 +60,7 @@ class DbTgUsers(DbMongo):
                 'mention': tg_user.mention
 
             })
+
             return True
         return False
 
@@ -68,8 +72,7 @@ class DbTgUsers(DbMongo):
         return cursor
 
     def update(self, user_id, key: str, value: str):
-        """ Обновление статуса подписчика
-        """
+        """Обновление статуса подписчика"""
         if self.get_tg_subscriber(user_id) is None:
             return False
         self.collection.update_one({"_id": user_id}, {"$set": {key: value}})
@@ -84,7 +87,9 @@ class DbStageResults(DbMongo):
     def __init__(self):
         super().__init__()
         self.current_db = self.connection[self.DB_NAME]
-        self.collection = self.current_db[f"stage_{config_bot.config_gymchana_cup['id_stage_now']}"]
+        self.collection = self.current_db[
+            f"stage_{config_bot.config_gymchana_cup['id_stage_now']}"
+        ]
 
     def add(self, result: StageSportsmanResult):
         """
@@ -94,18 +99,20 @@ class DbStageResults(DbMongo):
         """
         if self.collection.find_one({"_id": result.sportsman_id}):
             return False
-        self.collection.insert_one({
-            "_id": result.sportsman_id,
-            "userFullName": result.user_full_name,
-            "motorcycle": result.motorcycle,
-            "userCity": result.user_city,
-            "userCountry": result.user_country,
-            "athleteClass": result.athlete_class,
-            "resultTimeSeconds": result.result_time_seconds,
-            "resultTime": result.result_time,
-            "fine": result.fine,  # пенальти
-            "video": result.video
-        })
+        self.collection.insert_one(
+            {
+                "_id": result.sportsman_id,
+                "userFullName": result.user_full_name,
+                "motorcycle": result.motorcycle,
+                "userCity": result.user_city,
+                "userCountry": result.user_country,
+                "athleteClass": result.athlete_class,
+                "resultTimeSeconds": result.result_time_seconds,
+                "resultTime": result.result_time,
+                "fine": result.fine,  # пенальти
+                "video": result.video,
+            }
+        )
         return True
 
     def del_result(self, id_result: int):
@@ -133,18 +140,22 @@ class DbStageResults(DbMongo):
 
     def get_bestStage_time(self) -> int | None:
         try:
-            return self.collection.find().sort("resultTimeSeconds").limit(1)[0]["resultTimeSeconds"]
+            return (
+                self.collection.find()
+                .sort("resultTimeSeconds")
+                .limit(1)[0]["resultTimeSeconds"]
+            )
         except IndexError:
             return None
         except errors.ServerSelectionTimeoutError:
-            logger.exception(f"get_best_stage: MongoDB TIMEOUT ")
+            logger.exception("get_best_stage: MongoDB TIMEOUT ")
         except Exception as e:
             logger.exception(f"get_best_stage: {e}")
 
 
 class DbSubsAtheleteClass(DbMongo):
-    """ Работа с подписчиками для которых необходимо производить рассылку
-    """
+    """Работа с подписчиками для которых необходимо производить рассылку"""
+
     __db_name = "users_bot"
     __collection_name = "subs_class"
     ATHELETE_CLASSES = ("A", "B", "C1", "C2", "C3", "D1", "D2", "D3", "D4", "N")
@@ -155,12 +166,13 @@ class DbSubsAtheleteClass(DbMongo):
         self.collection = current_db[self.__collection_name]
 
     def get_subscriber(self, athelete_class: str) -> list:
-        """ Получение списка подписчика класса
-        """
+        """Получение списка подписчика класса"""
         try:
             connect = self.collection.find_one({"_id": athelete_class})
         except Exception as e:
-            logger.exception(f"DbSubsAtheleteClass: get_subscriber При ПОЛУЧЕНИИ подписчиков произошла ошибка:\n {e}")
+            logger.exception(
+                f"DbSubsAtheleteClass: get_subscriber При ПОЛУЧЕНИИ подписчиков произошла ошибка:\n {e}"
+            )
             raise e
         if connect is None:
             if athelete_class in self.ATHELETE_CLASSES:
@@ -170,34 +182,46 @@ class DbSubsAtheleteClass(DbMongo):
         return connect["id_tg_users"]
 
     def add_subscriber(self, athelete_class: str, tg_id: int) -> bool:
-        """ Добавление нового подписчика
-        """
+        """Добавление нового подписчика"""
         if athelete_class not in self.ATHELETE_CLASSES:
             logger.error("DbSubsAtheleteClass: add_subscriber Вызван запрещенный ключ")
-            raise AttributeError("DbSubsAtheleteClass: add_subscriber Вызван запрещенный ключ")
+            raise AttributeError(
+                "DbSubsAtheleteClass: add_subscriber Вызван запрещенный ключ"
+            )
 
         if tg_id in self.get_subscriber(athelete_class):
             raise ValueError("Пользователь уже существует")
 
         try:
             if self.collection.find_one({"_id": athelete_class}) is None:
-                self.collection.insert_one({"_id": athelete_class, "id_tg_users": [tg_id]})
+                self.collection.insert_one(
+                    {"_id": athelete_class, "id_tg_users": [tg_id]}
+                )
             else:
-                self.collection.update_one({"_id": athelete_class}, {"$push": {"id_tg_users": tg_id}})
+                self.collection.update_one(
+                    {"_id": athelete_class}, {"$push": {"id_tg_users": tg_id}}
+                )
         except Exception as e:
-            logger.exception(f"DbSubsAtheleteClass: add_subscriber При ДОБАВЛЕНИИ подписчика произошла ошибка:\n {e}")
+            logger.exception(
+                f"DbSubsAtheleteClass: add_subscriber При ДОБАВЛЕНИИ подписчика произошла ошибка:\n {e}"
+            )
             raise e
         return True
 
     def remove_subscriber(self, athelete_class: str, tg_id: int) -> bool:
-        """ Отписка подписчика
-        """
+        """Отписка подписчика"""
         if tg_id not in self.get_subscriber(athelete_class):
-            raise ValueError(f"Пользователь {tg_id} и так не подписан на {athelete_class}")
+            raise ValueError(
+                f"Пользователь {tg_id} и так не подписан на {athelete_class}"
+            )
         try:
-            self.collection.update_one({"_id": athelete_class}, {"$pull": {"id_tg_users": tg_id}})
+            self.collection.update_one(
+                {"_id": athelete_class}, {"$pull": {"id_tg_users": tg_id}}
+            )
         except Exception as e:
-            logger.exception(f"DbSubsAtheleteClass: add_subscriber При УДАЛЕНИИ подписчика произошла ошибка:\n {e}")
+            logger.exception(
+                f"DbSubsAtheleteClass: add_subscriber При УДАЛЕНИИ подписчика произошла ошибка:\n {e}"
+            )
             raise e
         return True
 

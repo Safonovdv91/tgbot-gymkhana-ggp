@@ -7,7 +7,6 @@ from aio_bot.aio_bot_functions import BotFunction
 
 
 class TestBotFunctionsSpendBestTime(unittest.TestCase):
-
     def test_time_to_string_milliSeconds(self):
         test = BotFunction()
         self.assertEqual(test.msec_to_mmssms(100), "00:00.100")
@@ -51,11 +50,10 @@ class TestBotFunctionsSpendBestTime(unittest.TestCase):
 
 
 class TestMilliSecondsMmssmsIntoWrongType(unittest.TestCase):
-
     def test_input_string(self):
         test = BotFunction()
-        self.assertEqual(test.msec_to_mmssms('61010'), "01:01.010")
-        self.assertEqual(test.msec_to_mmssms('75010'), "01:15.010")
+        self.assertEqual(test.msec_to_mmssms("61010"), "01:01.010")
+        self.assertEqual(test.msec_to_mmssms("75010"), "01:15.010")
 
     def test_input_alphastring(self):
         test = BotFunction()
@@ -63,13 +61,12 @@ class TestMilliSecondsMmssmsIntoWrongType(unittest.TestCase):
 
     def test_input_tuple(self):
         test = BotFunction()
-        self.assertEqual(test.msec_to_mmssms(('__', 'sda', 123)), None)
+        self.assertEqual(test.msec_to_mmssms(("__", "sda", 123)), None)
         self.assertEqual(test.msec_to_mmssms([123, 223]), None)
         self.assertEqual(test.msec_to_mmssms({123: 223}), None)
 
 
 class TestMMSSMsToMilliseconds(unittest.TestCase):
-
     def test_right_result(self):
         botfx = BotFunction()
 

@@ -17,7 +17,7 @@ class StageSubscribers:
     def athlete_class(self, value: str):
         if not isinstance(value, str):
             raise TypeError("Bad athelete class(type), must be str")
-        if not (value in self.__athelete_classes):
+        if value not in self.__athelete_classes:
             raise AttributeError(f"{value} Bad athelete class(attribute)")
         self._athlete_class = value
 
@@ -38,13 +38,12 @@ class StageSubscribers:
         self.subscribers_id.add(value)
 
     def removed_subscriber(self, value: int):
-        if not (value in self.subscribers_id):
+        if value not in self.subscribers_id:
             raise AttributeError("Haven't that subscriber")
         self.subscribers_id.remove(value)
 
 
 class Subscriber:
-
     def __init__(self, subscriber_id: int, sub_stage: bool, sub_stage_categories: set):
         self.subscriber_id = subscriber_id
         self.sub_stage = sub_stage
@@ -105,7 +104,7 @@ class StageSportsmanResult:
         if not isinstance(value, int):
             raise TypeError("Id must be Integer")
         if value <= 0:
-            raise AttributeError(f"ID must be positive value")
+            raise AttributeError("ID must be positive value")
 
         self._sportsman_id = value
 
@@ -118,7 +117,7 @@ class StageSportsmanResult:
         if not isinstance(value, int):
             raise TypeError("Result Time must be Integer")
         if value < 0:
-            raise AttributeError(f"Result must be positive value")
+            raise AttributeError("Result must be positive value")
         self._result_time_seconds = value
 
     @property
@@ -130,7 +129,7 @@ class StageSportsmanResult:
         if not isinstance(value, int):
             raise TypeError("Fine must be Integer")
         if value < 0:
-            raise AttributeError(f"Penalty must be positive value")
+            raise AttributeError("Penalty must be positive value")
         self._fine = value
 
 
