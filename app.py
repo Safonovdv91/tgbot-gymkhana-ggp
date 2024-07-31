@@ -77,6 +77,7 @@ async def scheduled():
                         f"{persents}% |   {each['resultTime']}\n"
                         f"{each['video']}"
                     )
+
                     msg_text = f"⚡ Новый результат\n{msg_text}"
 
                     # Добавляем новый результат спортсмена в базу данных
@@ -97,6 +98,7 @@ async def scheduled():
                             f"было:   |   [{db_sportsman['resultTime']}] \n {each['video']} "
                         )
                         msg_text = f"💥 Улучшил время\n {msg_text}"
+
                         # Обновляем новый результат спортсмена в базе данных
                         DBM.update_stage_result(sportsman_result)
 
@@ -120,6 +122,7 @@ async def scheduled():
                             BotInterface.unsub_tguser(tg_client)
                         except Exception as e:
                             logger.exception(f"Поймано исключение: {e}")
+
         except Exception as e:
             logger.exception(f"aio_bot_start: {e}")
             await bot.send_message(admin_id, f"Exception {e}")
