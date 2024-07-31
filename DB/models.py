@@ -78,12 +78,32 @@ class Subscriber:
 
 
 class StageSportsmanResult:
-    __slots__ = ("_sportsman_id", "user_full_name", "motorcycle", "user_city", "user_country",
-                 "athlete_class", "_result_time_seconds", "result_time", "_fine", "video")
+    __slots__ = (
+        "_sportsman_id",
+        "user_full_name",
+        "motorcycle",
+        "user_city",
+        "user_country",
+        "athlete_class",
+        "_result_time_seconds",
+        "result_time",
+        "_fine",
+        "video",
+    )
 
-    def __init__(self, sportsman_id: int | str, userFullName, motorcycle, userCity, userCountry,
-                 athleteClass, resultTimeSeconds: int, resultTime, fine: int, video):
-
+    def __init__(
+        self,
+        sportsman_id: int | str,
+        userFullName,
+        motorcycle,
+        userCity,
+        userCountry,
+        athleteClass,
+        resultTimeSeconds: int,
+        resultTime,
+        fine: int,
+        video,
+    ):
         self.sportsman_id = sportsman_id
         self.user_full_name = userFullName
         self.motorcycle = motorcycle
@@ -135,14 +155,13 @@ class StageSportsmanResult:
 
 @dataclass
 class TelegramUser:
-    """ dataclass tg user. who send msg.
-    """
+    """dataclass tg user. who send msg."""
+
     tg_id: int
     username: str
     first_name: str
     full_name: str
     language_code: str
-    mention: str
 
 
 @dataclass
@@ -154,13 +173,12 @@ class BetTimeTelegramUser:
     date_bet2: datetime = field(compare=False, default=datetime.now())
 
     def __setattr__(self, name, value):
-        if name == 'bet_time1' and value < 0:
+        if name == "bet_time1" and value < 0:
             raise ValueError("bet_time1 cannot be negative")
-        if name == 'bet_time2' and value < 0:
+        if name == "bet_time2" and value < 0:
             raise ValueError("bet_time2 cannot be negative")
         super().__setattr__(name, value)
 
 
 if __name__ == "__main__":
     pass
-
