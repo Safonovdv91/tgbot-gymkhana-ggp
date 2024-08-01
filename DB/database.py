@@ -39,10 +39,8 @@ def update_user_subs(message, sport_class, user_sub: str):
         message.from_user.language_code,
     )
 
-    logger.info(f"update {tg_user.tg_id} : {sport_class}")
     client = DbTgUsers()
     tg_client = client.get_tg_subscriber(tg_user.tg_id)
-
     subs_athelete = DbSubsAtheleteClass()
 
     if tg_client is None:
@@ -69,9 +67,11 @@ def update_user_subs(message, sport_class, user_sub: str):
             subs_athelete.add_subscriber(
                 user_sub, tg_subscriber.subscriber_id
             )  # Добавляем пользователя в рассылку
+            logger.info(
+                f"New subscriber id: {tg_subscriber.subscriber_id} {sport_class}"
+            )
         except ValueError:
             logger.info("Не добавили т.к. уже есть")
-        logger.info(f"New subscriber id: {tg_subscriber.subscriber_id} {sport_class}")
         """ --- recursion --- """
         update_user_subs(message, sport_class, user_sub)
         return "😸 You are welcome 😸"
@@ -87,6 +87,7 @@ def update_user_subs(message, sport_class, user_sub: str):
                 "sub_stage_cat",
                 tg_subscriber.sub_stage_categories,
             )
+            logger.info(f"user: {tg_subscriber.subscriber_id} отписался от {user_sub}")
             try:
                 subs_athelete.remove_subscriber(user_sub, tg_subscriber.subscriber_id)
             except ValueError:
@@ -105,6 +106,7 @@ def update_user_subs(message, sport_class, user_sub: str):
                 subs_athelete.add_subscriber(user_sub, tg_subscriber.subscriber_id)
             except ValueError:
                 logger.info("Не добавили такак не добавлен")
+            logger.info(f"user: {tg_subscriber.subscriber_id} подписался {user_sub}")
             return f"Вы успешно ПОДПИСАЛИСЬ на {sport_class}"
 
 
