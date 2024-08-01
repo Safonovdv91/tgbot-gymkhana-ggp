@@ -49,7 +49,6 @@ async def get_sportsmans_from_ggp_stage(site=SITE, api_gymkhana=API_GYMKHANA):
 
     stages = resp_json["stages"]
     for stage in stages:
-        # поиск действующего этапа, если его нет - значит этап не идет
         if stage["status"] in (
             "Приём результатов",
             "Подведение итогов",
