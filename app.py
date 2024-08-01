@@ -32,7 +32,7 @@ async def scheduled():
         try:
             logger.info("Тик бота")
             await asyncio.sleep(config_bot.config_gymchana_cup["GET_TIME_OUT"])
-            data_dic = get_info_api.get_sportsmans_from_ggp_stage()
+            data_dic = await get_info_api.get_sportsmans_from_ggp_stage()
             logger.debug(f" timeout = {config_bot.config_gymchana_cup['GET_TIME_OUT']}")
             if not data_dic:
                 continue
