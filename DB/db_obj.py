@@ -52,7 +52,7 @@ class DbTgUsers(DbMongo):
                     "_id": tg_user.tg_id,
                     "sub_stage": False,
                     "sub_stage_cat": subs_stage,
-                    "username": tg_user.first_name,
+                    "username": tg_user.username,
                     "first_name": tg_user.first_name,
                     "full_name": tg_user.full_name,
                     "language_code": tg_user.language_code,
