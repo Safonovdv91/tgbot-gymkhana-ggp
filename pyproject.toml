@@ -10,7 +10,6 @@ python = "^3.12"
 aiogram = "^3.8.0"
 pymongo = "^4.8.0"
 ruff = "^0.5.0"
-requests = "^2.32.3"
 poetry-plugin-dotenv = "^2.2.3"
 pyyaml = "^6.0.1"
 
