@@ -12,6 +12,7 @@ import asyncio
 import get_info_api
 from aio_bot.aio_bot_functions import BotInterface
 from app.handlers import router
+from app.betting.handlers import router as bet_router
 
 API_bot = config_bot.config["API_token"]
 admin_id = config_bot.config["admin_id"]
@@ -131,6 +132,7 @@ async def scheduled():
 # Запускаем лонг поллинг
 async def main():
     logger.info("Запускаем бота")
+    dp.include_router(bet_router)
     dp.include_router(router)
     asyncio.create_task(scheduled())  # Запуск периодической задачи
     await dp.start_polling(bot)

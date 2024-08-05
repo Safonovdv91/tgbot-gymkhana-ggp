@@ -8,9 +8,12 @@ btnStageMap = KeyboardButton(text="Получить 🗺 этапа")
 btnStageTime = KeyboardButton(text="Получить 🕗 этапа")
 btnSubscribe = KeyboardButton(text="Подписаться")
 btnSubscribeNews = KeyboardButton(text="Подписаться news")
+btnMakeBet = KeyboardButton(text="⌚ Сделать ставку")
+
 
 mainMenu = ReplyKeyboardMarkup(
-    resize_keyboard=True, keyboard=[[btnSubscribe, btnStageMap, btnStageTime]]
+    resize_keyboard=True,
+    keyboard=[[btnSubscribe, btnStageMap, btnStageTime], [btnMakeBet]],
 )
 
 # --- Subscribe Menu ---

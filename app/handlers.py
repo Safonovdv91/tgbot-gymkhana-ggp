@@ -1,4 +1,6 @@
 from aiogram import Router, types
+from aiogram.fsm.context import FSMContext
+
 from aio_bot import aio_markups as nav
 from aiogram.filters import CommandStart, Command
 
@@ -11,9 +13,10 @@ from DB.db_obj import DbStageResults
 import logger.my_logger
 import logging.handlers
 from aio_bot import aio_bot_functions
+from app.bot_states import BotStates
 
 router = Router()
-logger = logging.getLogger("app")
+logger = logging.getLogger("handlers")
 
 
 # Инициализация меню по нажатию старт
@@ -65,7 +68,7 @@ async def unsubscribe_bot(message: types.Message):
 
 
 @router.message()
-async def subscribe_results(message: types.Message):
+async def subscribe_results(message: types.Message, state: FSMContext):
     """Анализ сообщения для подписки"""
     if message.text == "Подписаться":
         await message.answer(
@@ -153,6 +156,18 @@ async def subscribe_results(message: types.Message):
         else:
             text = aio_bot_functions.BotFunction().make_calculate_text(b_result)
             await message.answer(text)
+    elif message.text == "⌚ Сделать ставку":
+        state_data = await state.update_data()
+        if state_data:
+            await message.answer(
+                f"Твои текущие данные {state_data}\n желаешь поменять?"
+            )
+            await state.set_state(BotStates.Get_betting_sure)
+        else:
+            await message.answer(
+                "Напишите свой ник(для отображение в таблице участников)"
+            )
+            await state.set_state(BotStates.Get_betting_nickname)
     else:
         try:
             best_time_ms = aio_bot_functions.BotFunction().convert_to_milliseconds(
