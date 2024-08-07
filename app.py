@@ -17,7 +17,7 @@ from app.betting.handlers import router as bet_router
 API_bot = config_bot.config["API_token"]
 admin_id = config_bot.config["admin_id"]
 
-logger.my_logger.init_logger("app", sh_level=10, fh_level=30)
+logger.my_logger.init_logger("app", sh_level=20, fh_level=30)
 logger = logging.getLogger("app")
 logger.info("Server is starting...")
 # инициализируем бота
@@ -31,7 +31,7 @@ async def scheduled():
     """Запланированная периодическая задача отвечающая за сравнение и раcсылку новых результатов"""
     while True:
         try:
-            logger.info("Тик бота")
+            logger.debug("Тик бота")
             await asyncio.sleep(config_bot.config_gymchana_cup["GET_TIME_OUT"])
             data_dic = await get_info_api.get_sportsmans_from_ggp_stage()
             logger.debug(f" timeout = {config_bot.config_gymchana_cup['GET_TIME_OUT']}")

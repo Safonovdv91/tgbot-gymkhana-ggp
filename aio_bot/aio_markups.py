@@ -8,13 +8,13 @@ btnStageMap = KeyboardButton(text="Получить 🗺 этапа")
 btnStageTime = KeyboardButton(text="Получить 🕗 этапа")
 btnSubscribe = KeyboardButton(text="Подписаться")
 btnSubscribeNews = KeyboardButton(text="Подписаться news")
-btnMakeBet = KeyboardButton(text="⌚ Сделать ставку")
-
+btnMakeBet = KeyboardButton(text="⌚ Сделать ставку на лучшее время GGP")
 
 mainMenu = ReplyKeyboardMarkup(
     resize_keyboard=True,
     keyboard=[[btnSubscribe, btnStageMap, btnStageTime], [btnMakeBet]],
 )
+
 
 # --- Subscribe Menu ---
 sub_A = KeyboardButton(text="🟥 🅰️")

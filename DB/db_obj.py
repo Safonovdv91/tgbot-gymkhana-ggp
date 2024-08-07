@@ -248,8 +248,20 @@ class DbBetTime(DbMongo):
     def get(self, tg_id):
         if tg_id == "all":
             list_time = []
-            for each in self.collection.find():
-                list_time.append(each["bet_time1"])
+            for db_bet in self.collection.find():
+                user = TelegramUser(
+                    tg_id=db_bet["tg_user"]["tg_id"],
+                    username=db_bet["tg_user"]["username"],
+                    first_name=db_bet["tg_user"]["first_name"],
+                    full_name=db_bet["tg_user"]["full_name"],
+                    language_code=db_bet["tg_user"]["language_code"],
+                )
+                bet = BetTimeTelegramUser(
+                    tg_user=user,
+                    bet_time1=db_bet["bet_time1"],
+                    date_bet1=db_bet["date_bet1"],
+                )
+                list_time.append(bet)
             return list_time
         return self.collection.find_one({"tg_user.tg_id": tg_id})
 

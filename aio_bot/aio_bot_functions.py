@@ -1,7 +1,5 @@
 import logging
-import os
 
-import requests
 from dataclasses import dataclass
 from typing import Any
 from DB.db_obj import DbTgUsers, DbSubsAtheleteClass, DbBetTime
