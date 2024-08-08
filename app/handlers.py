@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 
 from aiogram import Router, types
 from aiogram.fsm.context import FSMContext
@@ -72,6 +73,7 @@ async def send_map(message: types.Message):
 
 @router.message(F.text == "⌚ Сделать ставку на лучшее время GGP")
 async def make_bet(message: types.Message, state: FSMContext):
+    date_end = config_bot.config_gymchana_cup["end_bet_time"]
     db_bet = DbBetTime().get(tg_id=message.from_user.id)
     logger.info(f"Начал делать ставку: {message.from_user.username}")
 
@@ -93,6 +95,13 @@ async def make_bet(message: types.Message, state: FSMContext):
         bet_time = f"Bet time: {BotFunction.msec_to_mmssms(bet.bet_time1)}"
         bet_date = f"Bet date: {bet.date_bet1}"
         text = f"{nickname}\n{bet_time}\n{bet_date}"
+        if datetime.now() > date_end:
+            await message.answer(
+                "Приём ставок окончен:\nТвои данные:\n{}".format(text),
+                reply_markup=nav.mainMenu,
+            )
+            return
+
         await message.answer(
             f"Твои текущие данные:\n{text}",
             reply_markup=ReplyKeyboardMarkup(
@@ -108,8 +117,17 @@ async def make_bet(message: types.Message, state: FSMContext):
         )
     else:
         logger.info(f"делает новую ставку {message.from_user.username}")
+        if datetime.now() > date_end:
+            await message.answer(
+                "Приём ставок окончен, к сожалению ты не успел, попробуй на следующем этапе, "
+                "приём ставки на время длится 1 неделю с момента начала этапа.",
+                reply_markup=nav.mainMenu,
+            )
+            return
         await message.answer(
-            "Напишите время за которое вы ожиадаете что проедет лучший спортсмен\nПриём результата до 12.08.2024",
+            "Напишите время за которое вы ожиадаете что проедет лучший спортсмен\nПриём результата до {}".format(
+                date_end
+            ),
             reply_markup=ReplyKeyboardMarkup(
                 keyboard=[[btnBackToMenu]],
                 resize_keyboard=True,
