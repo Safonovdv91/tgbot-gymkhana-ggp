@@ -8,7 +8,7 @@ from datetime import datetime
 API_GYMKHANA = config_bot.config_gymchana_cup["API"]
 SITE = config_bot.config_gymchana_cup["site"]
 
-logger = logging.getLogger("app.get_info_api")
+logger = logging.getLogger(__name__)
 
 
 async def get_sportsmans_from_ggp_stage(site=SITE, api_gymkhana=API_GYMKHANA):
@@ -24,7 +24,7 @@ async def get_sportsmans_from_ggp_stage(site=SITE, api_gymkhana=API_GYMKHANA):
             ) as resp:
                 status_code = resp.status
                 get_api = await resp.text()
-                logger.debug(f"Получаем чампионаты:\n status: {status_code}")
+                logger.debug("Получаем чампионаты:\n status: %s", status_code)
     except ConnectionError:
         logger.error("Пропало соединение с интернетом")
         return {}
@@ -43,7 +43,7 @@ async def get_sportsmans_from_ggp_stage(site=SITE, api_gymkhana=API_GYMKHANA):
         ) as resp:
             status_code = resp.status
             get_api = await resp.text()
-            logger.debug(f"Получаем этапы:\n status: {status_code}")
+            logger.debug("Получаем этапы:\n status: %s", status_code)
             if status_code == 200:
                 resp_json = json.loads(get_api)
 

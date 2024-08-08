@@ -1,3 +1,7 @@
+import logging
+import asyncio
+import get_info_api
+
 from aiogram import exceptions
 from aiogram import Bot, Dispatcher
 from aio_bot import config_bot
@@ -5,11 +9,6 @@ from DB import database as DBM
 from DB.db_obj import DbStageResults, DbSubsAtheleteClass
 from DB.models import StageSportsmanResult
 
-# import os
-import logger.my_logger
-import logging.handlers
-import asyncio
-import get_info_api
 from aio_bot.aio_bot_functions import BotInterface
 from app.handlers import router
 from app.betting.handlers import router as bet_router
@@ -17,15 +16,23 @@ from app.betting.handlers import router as bet_router
 API_bot = config_bot.config["API_token"]
 admin_id = config_bot.config["admin_id"]
 
-logger.my_logger.init_logger("app", sh_level=20, fh_level=30)
-logger = logging.getLogger("app")
-logger.info("Server is starting...")
+
+def configure_logging(level=logging.INFO):
+    logging.basicConfig(
+        level=level,
+        datefmt="%Y-%m-%d %H:%M.%S",
+        format="[%(asctime)s.%(msecs)03d] %(module)15s:%(lineno)-4d %(levelname)7s - %(message)s",
+    )
+
+
+logger = logging.getLogger(__name__)
+configure_logging(level=logging.INFO)
+
 # инициализируем бота
 bot = Bot(token=API_bot)
 dp = Dispatcher()
 
 
-#
 # --- Периодическое обновление участников этапа ---
 async def scheduled():
     """Запланированная периодическая задача отвечающая за сравнение и раcсылку новых результатов"""
@@ -131,7 +138,6 @@ async def scheduled():
 
 # Запускаем лонг поллинг
 async def main():
-    logger.info("Запускаем бота")
     dp.include_router(bet_router)
     dp.include_router(router)
     asyncio.create_task(scheduled())  # Запуск периодической задачи
@@ -140,6 +146,7 @@ async def main():
 
 if __name__ == "__main__":
     try:
+        logger.info("Server is starting...")
         asyncio.run(main())
     except KeyboardInterrupt:
         logger.info("Бот остановлен пользователем")

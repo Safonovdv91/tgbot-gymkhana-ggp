@@ -7,7 +7,7 @@ from pymongo.results import DeleteResult
 from aio_bot import config_bot
 from DB.models import StageSportsmanResult, TelegramUser, BetTimeTelegramUser
 
-logger = logging.getLogger("app.DB.db_obj")
+logger = logging.getLogger(__name__)
 
 
 class DbMongo:
@@ -238,7 +238,11 @@ class DbBetTime(DbMongo):
         """Добавление ставки в БД"""
         if self.get(bet_object.tg_user.tg_id) is None:
             logger.info(
-                f"Ставка user:{bet_object.tg_user.tg_id} на время {bet_object.bet_time1}"
+                "Добавляем ставку: %s[%s] на время: %s [%s]{bet_object.bet_time1}",
+                bet_object.tg_user.tg_id,
+                bet_object.tg_user.username,
+                bet_object.bet_time1,
+                bet_object.date_bet1,
             )
             self.collection.insert_one(asdict(bet_object))
             return True
