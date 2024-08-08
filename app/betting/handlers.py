@@ -13,7 +13,7 @@ from app.bot_states import BotStates
 from aio_bot import aio_markups as nav
 
 router = Router()
-logger = logging.getLogger("app.betting.handlers")
+logger = logging.getLogger(__name__)
 
 
 @router.message(BotStates.Get_betting_nickname)
@@ -28,7 +28,7 @@ async def betting_take_nickname(message: types.Message, state: FSMContext) -> No
 
 @router.message(BotStates.Get_betting_time)
 async def betting_take_time(message: types.Message, state: FSMContext):
-    logger.info(f"{message.from_user.username} время ставки: {message.text}")
+    logger.debug("%s время ставки: %s", message.from_user.username, message.text)
     if message.text == "⬅ НАЗАД":
         await message.reply("Главное меню", reply_markup=nav.mainMenu)
         await state.clear()
@@ -36,10 +36,12 @@ async def betting_take_time(message: types.Message, state: FSMContext):
 
     bet_time = BotFunction.convert_to_milliseconds(message.text)
     if bet_time is None:
-        logger.info(f"{message.from_user.username} прислал херню.")
+        logger.info("%s прислал херню.", message.from_user.username)
         await message.reply(
             "Пришлите время в нормальном формате(mm:ss.ms или ss.ms) или нажмите кнопку 'назад'",
-            reply_markup=ReplyKeyboardMarkup(keyboard=[[btnBackToMenu]]),
+            reply_markup=ReplyKeyboardMarkup(
+                keyboard=[[btnBackToMenu]], resize_keyboard=True
+            ),
             input_field_placeholder="45.67 или 01:02.34",
         )
         return
