@@ -1,14 +1,15 @@
 import json
 import logging
+
 import aiohttp
 
 from aio_bot import config_bot
-from datetime import datetime
+from datetime import datetime, timedelta
 
 API_GYMKHANA = config_bot.config_gymchana_cup["API"]
 SITE = config_bot.config_gymchana_cup["site"]
 
-logger = logging.getLogger("app.get_info_api")
+logger = logging.getLogger(__name__)
 
 
 async def get_sportsmans_from_ggp_stage(site=SITE, api_gymkhana=API_GYMKHANA):
@@ -24,7 +25,7 @@ async def get_sportsmans_from_ggp_stage(site=SITE, api_gymkhana=API_GYMKHANA):
             ) as resp:
                 status_code = resp.status
                 get_api = await resp.text()
-                logger.debug(f"Получаем чампионаты:\n status: {status_code}")
+                logger.debug("Получаем чампионаты:\n status: %s", status_code)
     except ConnectionError:
         logger.error("Пропало соединение с интернетом")
         return {}
@@ -43,7 +44,7 @@ async def get_sportsmans_from_ggp_stage(site=SITE, api_gymkhana=API_GYMKHANA):
         ) as resp:
             status_code = resp.status
             get_api = await resp.text()
-            logger.debug(f"Получаем этапы:\n status: {status_code}")
+            logger.debug("Получаем этапы:\n status: %s", status_code)
             if status_code == 200:
                 resp_json = json.loads(get_api)
 
@@ -54,6 +55,10 @@ async def get_sportsmans_from_ggp_stage(site=SITE, api_gymkhana=API_GYMKHANA):
             "Подведение итогов",
         ):
             now_stage = stage
+            start_stage_date = datetime.fromtimestamp(stage["dateStart"])
+            config_bot.config_gymchana_cup["end_bet_time"] = (
+                start_stage_date + timedelta(weeks=1)
+            )
             async with aiohttp.ClientSession() as session:
                 async with session.get(
                     f"{site}/stages/get?signature={api_gymkhana}&id={now_stage['id']}&type=gp"
@@ -79,3 +84,4 @@ async def get_sportsmans_from_ggp_stage(site=SITE, api_gymkhana=API_GYMKHANA):
     config_bot.config_gymchana_cup["GET_TIME_OUT"] = 60 * 60 * 3
     logger.info(f"Таймаут = {config_bot.config_gymchana_cup['GET_TIME_OUT']}с")
     config_bot.config_gymchana_cup["trackUrl"] = False
+    config_bot.config_gymchana_cup["end_bet_time"] = datetime(2020, 1, 1, 1, 1)

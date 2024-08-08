@@ -6,7 +6,9 @@ from DB.db_obj import DbBetTime
 
 
 class TestBetTime(unittest.TestCase, BetTime):
-    tguser = TelegramUser(1120145735, 'novik0ff954', 'Pavel', 'Pavel Novikov', 'ru', '@novik0ff954')
+    tguser = TelegramUser(
+        1120145735, "novik0ff954", "Pavel", "Pavel Novikov", "ru", "@novik0ff954"
+    )
 
     def test_receive_integer(self):
         bet1 = BetTime(self.tguser, 10)
@@ -44,11 +46,13 @@ class TestBetTime(unittest.TestCase, BetTime):
 
 
 class TestTotalizator(unittest.TestCase, DbBetTime):
-    user1 = TelegramUser(1120145735, 'novik0ff954', 'Pavel', 'Pavel Novikov', 'ru', '@novik0ff954')
-    user2 = TelegramUser(987654321, 'johndoe', 'John', 'John Doe', 'en', '@johndoe')
-    user3 = TelegramUser(123456789, 'alice', 'Alice', 'Alice Smith', 'en', '@alice')
-    user4 = TelegramUser(555555555, 'bob', 'Bob', 'Bob Johnson', 'en', '@bob')
-    user5 = TelegramUser(999999999, 'emma', 'Emma', 'Emma Thompson', 'en', '@emma')
+    user1 = TelegramUser(
+        1120145735, "novik0ff954", "Pavel", "Pavel Novikov", "ru", "@novik0ff954"
+    )
+    user2 = TelegramUser(987654321, "johndoe", "John", "John Doe", "en", "@johndoe")
+    user3 = TelegramUser(123456789, "alice", "Alice", "Alice Smith", "en", "@alice")
+    user4 = TelegramUser(555555555, "bob", "Bob", "Bob Johnson", "en", "@bob")
+    user5 = TelegramUser(999999999, "emma", "Emma", "Emma Thompson", "en", "@emma")
 
     user1_bet = BetTimeTelegramUser(user1, 45_000)
     user2_bet = BetTimeTelegramUser(user2, 50_000)
@@ -61,4 +65,3 @@ class TestTotalizator(unittest.TestCase, DbBetTime):
         bet = 35
         closest = BotFunction.find_closest_number(numbers, bet)
         self.assertEqual(closest, 30)
-

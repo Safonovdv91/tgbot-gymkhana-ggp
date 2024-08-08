@@ -7,7 +7,7 @@ from pymongo.results import DeleteResult
 from aio_bot import config_bot
 from DB.models import StageSportsmanResult, TelegramUser, BetTimeTelegramUser
 
-logger = logging.getLogger("app.DB.db_obj")
+logger = logging.getLogger(__name__)
 
 
 class DbMongo:
@@ -238,7 +238,11 @@ class DbBetTime(DbMongo):
         """Добавление ставки в БД"""
         if self.get(bet_object.tg_user.tg_id) is None:
             logger.info(
-                f"Ставка user:{bet_object.tg_user.tg_id} на время {bet_object.bet_time1}"
+                "Добавляем ставку: %s[%s] на время: %s [%s]{bet_object.bet_time1}",
+                bet_object.tg_user.tg_id,
+                bet_object.tg_user.username,
+                bet_object.bet_time1,
+                bet_object.date_bet1,
             )
             self.collection.insert_one(asdict(bet_object))
             return True
@@ -248,8 +252,20 @@ class DbBetTime(DbMongo):
     def get(self, tg_id):
         if tg_id == "all":
             list_time = []
-            for each in self.collection.find():
-                list_time.append(each["bet_time1"])
+            for db_bet in self.collection.find():
+                user = TelegramUser(
+                    tg_id=db_bet["tg_user"]["tg_id"],
+                    username=db_bet["tg_user"]["username"],
+                    first_name=db_bet["tg_user"]["first_name"],
+                    full_name=db_bet["tg_user"]["full_name"],
+                    language_code=db_bet["tg_user"]["language_code"],
+                )
+                bet = BetTimeTelegramUser(
+                    tg_user=user,
+                    bet_time1=db_bet["bet_time1"],
+                    date_bet1=db_bet["date_bet1"],
+                )
+                list_time.append(bet)
             return list_time
         return self.collection.find_one({"tg_user.tg_id": tg_id})
 
