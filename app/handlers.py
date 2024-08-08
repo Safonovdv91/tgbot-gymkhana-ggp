@@ -86,7 +86,7 @@ async def send_map(message: types.Message):
                     photo=config_bot.config_gymchana_cup["trackUrl"], caption=track_url
                 )
             else:
-                await message.answer(" Сейчас межсезонье мэн, покатай базовую фигуру")
+                await message.answer("Сейчас межсезонье мэн, покатай базовую фигуру")
         except Exception as e:
             logger.exception(
                 f"Поймано исключение при отправке карты этапа {message.from_user.id} : -",
@@ -150,7 +150,7 @@ async def make_bet(message: types.Message, state: FSMContext):
 
 @router.message(F.text == "Подписаться")
 async def subscribe_ggp_class(message: types.Message, state: FSMContext):
-    logger.info(f"Начал подписываться на классы{message.from_user.username}")
+    logger.info(f"Начал подписываться на классы: {message.from_user.username}")
     await state.set_state(BotStates.GGP_CLASS_SUBSCRIBE)
     await subscribe_results(message, state)
     await message.answer(
