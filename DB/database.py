@@ -1,6 +1,6 @@
 import logging
 
-from DB.db_obj import DbTgUsers, DbStageResults, DbSubsAtheleteClass
+from DB.db_obj import DbStageResults, DbSubsAtheleteClass, DbTgUsers
 from DB.models import Subscriber, TelegramUser
 
 logger = logging.getLogger("app.DB.database")
@@ -67,9 +67,7 @@ def update_user_subs(message, sport_class, user_sub: str):
             subs_athelete.add_subscriber(
                 user_sub, tg_subscriber.subscriber_id
             )  # Добавляем пользователя в рассылку
-            logger.info(
-                f"New subscriber id: {tg_subscriber.subscriber_id} {sport_class}"
-            )
+            logger.info(f"New subscriber id: {tg_subscriber.subscriber_id} {sport_class}")
         except ValueError:
             logger.info("Не добавили т.к. уже есть")
         """ --- recursion --- """

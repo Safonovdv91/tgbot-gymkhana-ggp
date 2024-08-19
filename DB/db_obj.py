@@ -1,11 +1,11 @@
 import logging
 from dataclasses import asdict
 
-from pymongo import MongoClient
-from pymongo import errors
+from pymongo import MongoClient, errors
 from pymongo.results import DeleteResult
+
 from aio_bot import config_bot
-from DB.models import StageSportsmanResult, TelegramUser, BetTimeTelegramUser
+from DB.models import BetTimeTelegramUser, StageSportsmanResult, TelegramUser
 
 logger = logging.getLogger(__name__)
 
@@ -139,9 +139,7 @@ class DbStageResults(DbMongo):
     def get_bestStage_time(self) -> int | None:
         try:
             return (
-                self.collection.find()
-                .sort("resultTimeSeconds")
-                .limit(1)[0]["resultTimeSeconds"]
+                self.collection.find().sort("resultTimeSeconds").limit(1)[0]["resultTimeSeconds"]
             )
         except IndexError:
             return None
@@ -183,18 +181,14 @@ class DbSubsAtheleteClass(DbMongo):
         """Добавление нового подписчика"""
         if athelete_class not in self.ATHELETE_CLASSES:
             logger.error("DbSubsAtheleteClass: add_subscriber Вызван запрещенный ключ")
-            raise AttributeError(
-                "DbSubsAtheleteClass: add_subscriber Вызван запрещенный ключ"
-            )
+            raise AttributeError("DbSubsAtheleteClass: add_subscriber Вызван запрещенный ключ")
 
         if tg_id in self.get_subscriber(athelete_class):
             raise ValueError("Пользователь уже существует")
 
         try:
             if self.collection.find_one({"_id": athelete_class}) is None:
-                self.collection.insert_one(
-                    {"_id": athelete_class, "id_tg_users": [tg_id]}
-                )
+                self.collection.insert_one({"_id": athelete_class, "id_tg_users": [tg_id]})
             else:
                 self.collection.update_one(
                     {"_id": athelete_class}, {"$push": {"id_tg_users": tg_id}}
@@ -209,13 +203,9 @@ class DbSubsAtheleteClass(DbMongo):
     def remove_subscriber(self, athelete_class: str, tg_id: int) -> bool:
         """Отписка подписчика"""
         if tg_id not in self.get_subscriber(athelete_class):
-            raise ValueError(
-                f"Пользователь {tg_id} и так не подписан на {athelete_class}"
-            )
+            raise ValueError(f"Пользователь {tg_id} и так не подписан на {athelete_class}")
         try:
-            self.collection.update_one(
-                {"_id": athelete_class}, {"$pull": {"id_tg_users": tg_id}}
-            )
+            self.collection.update_one({"_id": athelete_class}, {"$pull": {"id_tg_users": tg_id}})
         except Exception as e:
             logger.exception(
                 f"DbSubsAtheleteClass: add_subscriber При УДАЛЕНИИ подписчика произошла ошибка:\n {e}"
@@ -230,9 +220,7 @@ class DbBetTime(DbMongo):
     def __init__(self):
         super().__init__()
         self.current_db = self.connection[self.DB_NAME]
-        self.collection = self.current_db[
-            f"bet_{config_bot.config_gymchana_cup['id_stage_now']}"
-        ]
+        self.collection = self.current_db[f"bet_{config_bot.config_gymchana_cup['id_stage_now']}"]
 
     def add(self, bet_object: BetTimeTelegramUser):
         """Добавление ставки в БД"""
