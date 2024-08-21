@@ -143,3 +143,4 @@ async def get_bet_time_table(message: types.Message, state: FSMContext):
             f" - {BotFunction.msec_to_mmssms(bet_users[i].bet_time1)}\n"
         )
     await message.answer(f"Все ставки {text}", reply_markup=nav.main_menu)
+

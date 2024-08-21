@@ -229,7 +229,7 @@ async def get_time_stage(message: types.Message):
         if config_bot.config_gymchana_cup["trackUrl"] is False:
             await message.answer("На данный момент ещё нет ни одного результата")
             return
-        b_result = DbStageResults().get_bestStage_time()
+        b_result = DbStageResults().get_best_stage_time()
         if b_result is None:
             await message.answer("На данный момент ещё нет ни одного результата")
         else:

@@ -22,7 +22,7 @@ class DbMongo:
         try:
             self.connection = MongoClient(self.ipaddress, self.port)
         except errors.ServerSelectionTimeoutError:
-            print("catch exeption")
+            logger.exception("Инициалищзация соединения")
             raise Exception("MongoDB is TimeOut")
 
     def close(self):
@@ -136,7 +136,7 @@ class DbStageResults(DbMongo):
             self.del_result(result["userId"])
         self.add(new_result)
 
-    def get_bestStage_time(self) -> int | None:
+    def get_best_stage_time(self) -> int | None:
         try:
             return (
                 self.collection.find().sort("resultTimeSeconds").limit(1)[0]["resultTimeSeconds"]
@@ -266,14 +266,3 @@ class DbBetTime(DbMongo):
         ls = self.get("all")
         closest_time = BotFunction.find_closest_number(ls, bet_time1)
         return self.collection.find_one({"bet_time1": closest_time})
-
-
-def main():
-    client = DbTgUsers().get_all_subscribers()
-    for each in client:
-        if len(each["sub_stage_cat"]):
-            print(each["_id"])
-
-
-if __name__ == "__main__":
-    main()

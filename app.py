@@ -45,7 +45,7 @@ async def scheduled():
             get_results_from_stage = data_dic["results"]
 
             for each in get_results_from_stage:
-                b_result = DbStageResults().get_bestStage_time()
+                b_result = DbStageResults().get_best_stage_time()
                 msg_text = False
                 sportsman_result = StageSportsmanResult(
                     each["userId"],
