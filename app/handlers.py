@@ -1,19 +1,18 @@
 import logging
-from datetime import datetime
 
-from aiogram import F, Router, types
+from aiogram import Bot, F, Router, types
 from aiogram.filters import Command, CommandStart
 from aiogram.fsm.context import FSMContext
 from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
 
-# import os
 from aio_bot import aio_bot_functions, aio_markups as nav, config_bot
 from aio_bot.aio_bot_functions import BotFunction, BotInterface, DoBet
 from aio_bot.aio_markups import btnBackToMenu
+from app.betting.sender import BettingMessageSender
 from app.bot_states import BotStates
 from app.constants import BAD_MESSAGE, HELP_MESSAGE, START_MESSAGE
 from DB import database as DBM
-from DB.db_obj import DbBetTime, DbStageResults
+from DB.db_obj import DbBetTime, DbStageResults, DbTgUsers
 from DB.models import BetTimeTelegramUser, TelegramUser
 
 router = Router()
@@ -44,6 +43,29 @@ async def unsubscribe_bot(message: types.Message):
     )
     BotInterface.unsub_tguser(message.from_user.id)
     await message.answer("Прощай друг 😿")
+
+
+@router.message(Command("broadcast"))
+async def broadcast_message_to_all_users(message: types.Message, state: FSMContext):
+    logger.info("Начал массовую рассылку %s", message.from_user.id)
+    if message.from_user.id != config_bot.config["admin_id"]:
+        logger.warning(
+            "Несанкционированная попытка броадкаста от пользователя %s | [%s]",
+            message.from_user.full_name,
+            message.from_user.id,
+        )
+        await message.answer("Вы не являетесь админом, и не имеете возможности броадкаста")
+        return
+    await state.set_state(BotStates.Broadcasting)
+    await message.answer("Напишите сообщение которое планируете разослать:")
+
+
+@router.message(BotStates.Broadcasting)
+async def send_message_to_all_users(message: types.Message, state: FSMContext):
+    users = DbTgUsers().get_all_subscribers()
+    for user in users:
+        await BotMessageSender().send_msg(user_id=user["_id"], message=message.text, nav_menu=nav.main_menu)
+    await state.clear()
 
 
 @router.message(F.text == "Получить 🗺 этапа")
@@ -113,6 +135,9 @@ async def make_bet(message: types.Message, state: FSMContext):
                 "Приём ставок окончен:\nТвои данные:\n{}".format(text),
                 reply_markup=nav.main_menu,
             )
+            text = await BettingMessageSender.get_sorted_bets()
+            if text:
+                await message.answer(text, reply_markup=nav.main_menu)
             await state.clear()
             return
 
@@ -265,3 +290,25 @@ async def get_time_stage(message: types.Message):
                 BAD_MESSAGE,
                 reply_markup=nav.main_menu,
             )
+
+
+class BotMessageSender:
+    def __init__(self):
+        self.API_bot = config_bot.config["API_token"]
+        self.bot = Bot(token=self.API_bot)
+
+    async def send_msg(self, user_id: int, message: str, nav_menu=nav.main_menu):
+        logger.info("Высылаем сообщение %s / %s", user_id, message)
+        try:
+            await self.bot.send_message(chat_id=user_id, text=message, reply_markup=nav_menu)
+        except Exception:
+            logger.exception("Ошибка при массовой рассылке сообщений")
+        await self.close()
+
+    async def broadcast_msg(self, users_id: list[int], message: str):
+        for user_id in users_id:
+            await self.send_msg(user_id, message)
+
+    async def close(self):
+        logger.debug("Закрываем содинение сессии aiogram")
+        await self.bot.session.close()
