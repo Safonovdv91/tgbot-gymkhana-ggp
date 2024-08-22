@@ -56,7 +56,7 @@ async def get_sportsmans_from_ggp_stage(site=SITE, api_gymkhana=API_GYMKHANA):
             now_stage = stage
             start_stage_date = datetime.fromtimestamp(stage["dateStart"])
             config_bot.config_gymchana_cup["end_bet_time"] = start_stage_date + timedelta(
-                weeks=1, days=2, hours=3
+                weeks=1, days=0, hours=3
             )
             async with aiohttp.ClientSession() as session:
                 async with session.get(
