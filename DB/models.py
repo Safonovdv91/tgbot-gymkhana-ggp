@@ -182,6 +182,7 @@ class BetTimeTelegramUser:
     date_bet1: datetime = datetime.now()
     bet_time2: int = field(default=0)
     date_bet2: datetime = field(compare=False, default=datetime.now())
+    delta_bet_time1: None = None
 
     def __setattr__(self, name, value):
         if name == "bet_time1" and value < 0:

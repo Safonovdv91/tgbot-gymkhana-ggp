@@ -8,22 +8,13 @@ from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
 from aio_bot import aio_markups as nav
 from aio_bot.aio_bot_functions import BotFunction
 from aio_bot.aio_markups import btnBackToMenu
+from app.betting.sender import BettingMessageSender
 from app.bot_states import BotStates
 from DB.db_obj import DbBetTime
 from DB.models import BetTimeTelegramUser, TelegramUser
 
 router = Router()
 logger = logging.getLogger(__name__)
-
-
-@router.message(BotStates.Get_betting_nickname)
-async def betting_take_nickname(message: types.Message, state: FSMContext) -> None:
-    nickname = message.text
-    await state.update_data(nickname=nickname)
-    await state.set_state(BotStates.Get_betting_time)
-    await message.answer(
-        "Напиши время за которые ты ожидаешь что будет проехан этап лучшим спортсменом!"
-    )
 
 
 @router.message(BotStates.Get_betting_time)
@@ -110,7 +101,7 @@ async def betting_r_u_sure(message: types.Message, state: FSMContext):
         )
 
 
-@router.message(F.text == "Поменять ставку")
+@router.message(BotStates.Doing_bet, F.text == "Поменять ставку")
 async def subscribe_ggp_class(message: types.Message, state: FSMContext):
     logger.info("Запрос изменения ставки от: %s", message.from_user.username)
     await message.answer(
@@ -124,7 +115,7 @@ async def subscribe_ggp_class(message: types.Message, state: FSMContext):
     await state.set_state(BotStates.Get_betting_time)
 
 
-@router.message(F.text == "Отменить ставку")
+@router.message(BotStates.Doing_bet, F.text == "Отменить ставку")
 async def cancel_bet_time(message: types.Message, state: FSMContext):
     logger.info("Пришла отмена ставки от: %s", message.from_user.username)
     DbBetTime().remove(tg_id=message.from_user.id)
@@ -135,12 +126,12 @@ async def cancel_bet_time(message: types.Message, state: FSMContext):
 @router.message(F.text == "Таблица ставок")
 async def get_bet_time_table(message: types.Message, state: FSMContext):
     logger.info("Запрос таблицы ставок от: %s", message.from_user.username)
-    bet_users = DbBetTime().get(tg_id="all")
-    text = "Все ставки:\n"
-    for i in range(len(bet_users)):
-        text += (
-            f"\t{i+1}) - {bet_users[i].tg_user.username}"
-            f" - {BotFunction.msec_to_mmssms(bet_users[i].bet_time1)}\n"
-        )
+    text = await BettingMessageSender.get_all_bets()
     await message.answer(f"Все ставки {text}", reply_markup=nav.main_menu)
 
+
+@router.message(F.text == "s")
+async def answer_sorted_bets(message: types.Message):
+    logger.info("Запрос сортированных ставок от: %s", message.from_user.username)
+    text = await BettingMessageSender.get_sorted_bets()
+    await message.answer(text, reply_markup=nav.main_menu)

@@ -8,7 +8,7 @@ from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
 
 # import os
 from aio_bot import aio_bot_functions, aio_markups as nav, config_bot
-from aio_bot.aio_bot_functions import BotFunction, BotInterface
+from aio_bot.aio_bot_functions import BotFunction, BotInterface, DoBet
 from aio_bot.aio_markups import btnBackToMenu
 from app.bot_states import BotStates
 from app.constants import BAD_MESSAGE, HELP_MESSAGE, START_MESSAGE
@@ -86,14 +86,12 @@ async def send_map(message: types.Message):
 
 @router.message(F.text == "⌚ Сделать ставку на лучшее время GGP")
 async def make_bet(message: types.Message, state: FSMContext):
-    date_end = config_bot.config_gymchana_cup["end_bet_time"]
     db_bet = DbBetTime().get(tg_id=message.from_user.id)
     logger.info("Начал делать ставку: %s", message.from_user.username)
 
     # Считываем данные о юзере
     if db_bet:
         logger.info("%s - уже есть в базе", message.from_user.username)
-
         user = TelegramUser(
             tg_id=db_bet["tg_user"]["tg_id"],
             username=db_bet["tg_user"]["username"],
@@ -110,11 +108,12 @@ async def make_bet(message: types.Message, state: FSMContext):
         bet_time = f"Bet time: {BotFunction.msec_to_mmssms(bet.bet_time1)}"
         bet_date = f"Bet date: {bet.date_bet1}"
         text = f"{nickname}\n{bet_time}\n{bet_date}"
-        if datetime.now() > date_end:
+        if not DoBet.is_can_bet():
             await message.answer(
                 "Приём ставок окончен:\nТвои данные:\n{}".format(text),
                 reply_markup=nav.main_menu,
             )
+            await state.clear()
             return
 
         await message.answer(
@@ -130,9 +129,10 @@ async def make_bet(message: types.Message, state: FSMContext):
                 resize_keyboard=True,
             ),
         )
+        await state.set_state(BotStates.Doing_bet)
     else:
         logger.info("Делает новую ставку %s", message.from_user.username)
-        if datetime.now() > date_end:
+        if not DoBet.is_can_bet():
             await message.answer(
                 "Приём ставок окончен, к сожалению ты не успел, "
                 "попробуй на следующем этапе, "
@@ -143,7 +143,7 @@ async def make_bet(message: types.Message, state: FSMContext):
         await message.answer(
             "Напишите время за которое вы ожиадаете что проедет"
             " лучший спортсмен\n"
-            "Приём результата до {}".format(date_end),
+            "Приём результата до {}".format(config_bot.config_gymchana_cup["end_bet_time"]),
             reply_markup=ReplyKeyboardMarkup(
                 keyboard=[[btnBackToMenu]],
                 resize_keyboard=True,

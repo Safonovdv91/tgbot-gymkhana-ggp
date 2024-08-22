@@ -1,7 +1,9 @@
 import logging
 from dataclasses import dataclass
+from datetime import datetime
 from typing import Any
 
+from aio_bot import config_bot
 from DB.db_obj import DbBetTime, DbSubsAtheleteClass, DbTgUsers
 from DB.models import BetTimeTelegramUser, TelegramUser
 
@@ -123,6 +125,13 @@ class DoBet:
         mmssmm = BotFunction.msec_to_mmssms(time_ms)
         msg = f"Ваша ставка {tg_user.full_name} на время принята: {mmssmm}"
         return msg
+
+    @staticmethod
+    def is_can_bet() -> bool:
+        date_end = config_bot.config_gymchana_cup["end_bet_time"]
+        if datetime.now() > date_end:
+            return False
+        return True
 
     @staticmethod
     def get_my_bet(message):
