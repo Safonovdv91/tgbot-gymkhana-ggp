@@ -60,11 +60,34 @@ async def broadcast_message_to_all_users(message: types.Message, state: FSMConte
     await message.answer("Напишите сообщение которое планируете разослать:")
 
 
+@router.message(Command("list_all_users"))
+async def get_all_users(message: types.Message):
+    logger.info("Запросил всех пользователей %s", message.from_user.full_name)
+    if message.from_user.id != config_bot.config["admin_id"]:
+        logger.warning(
+            "Несанкционированная попытка получения всех пользователей от ользователя %s | [%s]",
+            message.from_user.full_name,
+            message.from_user.id,
+        )
+        await message.answer("Вы не являетесь админом, и не имеете возможности броадкаста")
+        return
+    users = DbTgUsers().get_all_subscribers()
+    text = "Все пользователи бота:\n"
+    count = 0
+    for user in users:
+        count += 1
+        text += f"{user["_id"]} "
+    text += f"\nВсего {count} пользователей"
+    await message.answer(text)
+
+
 @router.message(BotStates.Broadcasting)
 async def send_message_to_all_users(message: types.Message, state: FSMContext):
     users = DbTgUsers().get_all_subscribers()
     for user in users:
-        await BotMessageSender().send_msg(user_id=user["_id"], message=message.text, nav_menu=nav.main_menu)
+        await BotMessageSender().send_msg(
+            user_id=user["_id"], message=message.text, nav_menu=nav.main_menu
+        )
     await state.clear()
 
 
