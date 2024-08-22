@@ -5,11 +5,12 @@ from aiogram import F, Router, types
 from aiogram.fsm.context import FSMContext
 from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
 
-from aio_bot import aio_markups as nav
+from aio_bot import aio_markups as nav, config_bot
 from aio_bot.aio_bot_functions import BotFunction
 from aio_bot.aio_markups import btnBackToMenu
 from app.betting.sender import BettingMessageSender
 from app.bot_states import BotStates
+from app.handlers import BotMessageSender
 from DB.db_obj import DbBetTime
 from DB.models import BetTimeTelegramUser, TelegramUser
 
@@ -131,7 +132,27 @@ async def get_bet_time_table(message: types.Message, state: FSMContext):
 
 
 @router.message(F.text == "s")
-async def answer_sorted_bets(message: types.Message):
-    logger.info("Запрос сортированных ставок от: %s", message.from_user.username)
-    text = await BettingMessageSender.get_sorted_bets()
-    await message.answer(text, reply_markup=nav.main_menu)
+async def broadcast_bet_message(message: types.Message):
+    logger.info("Рассылка массовых уведомлений %s", message.from_user.username)
+    if message.from_user.id == config_bot.config["admin_id"]:
+        text = await BettingMessageSender.get_sorted_bets()
+        users = DbBetTime().get(tg_id="all")
+        users = await BettingMessageSender.sort_by_delta_time(users)
+        for i in range(len(users)):
+            if i < 3:
+                msg = (
+                    f"Поздравляю {users[i].tg_user.full_name} ты попал в тройку лидеров предсказателей времени!\n "
+                    f"Твое место: {i+1} !\n "
+                    f"Разница во времени {users[i].delta_bet_time1} мс\n"
+                    f"И таблица всех кто делал ставку на время. Можешь подумать как это разослать более красиво!"
+                )
+            else:
+                msg = (
+                    f"Поздравляю {users[i].tg_user.first_name} попытался угадать время и почти угадал:\n "
+                    f"Твое место: {i+1}!\n "
+                    f"Разница во времени {users[i].delta_bet_time1} мс\n"
+                    f"И таблица всех кто делал ставку на время. Можешь подумать как это разослать более красиво!"
+                )
+            await BotMessageSender().send_msg(users[i].tg_user.tg_id, msg)
+            await BotMessageSender().send_msg(users[i].tg_user.tg_id, text)
+        await message.answer(f"Сообщение разослано по {users}")
