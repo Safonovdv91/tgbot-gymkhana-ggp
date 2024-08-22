@@ -8,3 +8,4 @@ class BotStates(StatesGroup):
     Get_betting_sure = State()
 
     GGP_CLASS_SUBSCRIBE = State()
+    Broadcasting = State()
