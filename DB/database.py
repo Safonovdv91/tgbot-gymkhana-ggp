@@ -1,17 +1,17 @@
 import logging
 
 from DB.db_obj import DbStageResults, DbSubsAtheleteClass, DbTgUsers
-from DB.models import Subscriber, TelegramUser
+from DB.models import StageSportsmanResult, Subscriber, TelegramUser
 
 logger = logging.getLogger("app.DB.database")
 
 
-def add_stage_result(result) -> bool:
+def add_stage_result(result: StageSportsmanResult) -> bool:
     """Функция добавления нового результата спортсмена"""
-    logger.info(f"Добавляем результат {result}")
+    logger.info(f"Добавляем результат [{result.athlete_class}] | {result.user_full_name}")
     client = DbStageResults()
     client.add(result)
-    return result
+    return True
 
 
 def update_stage_result(result):
