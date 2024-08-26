@@ -140,18 +140,18 @@ async def broadcast_bet_message(message: types.Message):
         users = await BettingMessageSender.sort_by_delta_time(users)
         for i in range(len(users)):
             if i < 3:
+                delta_time = BotFunction.msec_to_mmssms(users[i].delta_bet_time1)
                 msg = (
                     f"Поздравляю {users[i].tg_user.full_name} ты попал в тройку лидеров предсказателей времени!\n "
                     f"Твое место: {i+1} !\n "
-                    f"Разница во времени {users[i].delta_bet_time1} мс\n"
-                    f"И таблица всех кто делал ставку на время. Можешь подумать как это разослать более красиво!"
+                    f"Не угадал всего лишь на: {delta_time}\n"
                 )
             else:
+                delta_time = BotFunction.msec_to_mmssms(users[i].delta_bet_time1)
                 msg = (
                     f"Поздравляю {users[i].tg_user.first_name} попытался угадать время и почти угадал:\n "
                     f"Твое место: {i+1}!\n "
-                    f"Разница во времени {users[i].delta_bet_time1} мс\n"
-                    f"И таблица всех кто делал ставку на время. Можешь подумать как это разослать более красиво!"
+                    f"Не угадал всего лишь на: {delta_time}\n"
                 )
             await BotMessageSender().send_msg(users[i].tg_user.tg_id, msg)
             await BotMessageSender().send_msg(users[i].tg_user.tg_id, text)

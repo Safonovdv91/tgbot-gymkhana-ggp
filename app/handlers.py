@@ -95,11 +95,8 @@ async def send_message_to_all_users(message: types.Message, state: FSMContext):
 async def send_map(message: types.Message):
     if message.text == "Получить 🗺 этапа":
         logger.info(
-            "Пришел запрос карты",
-            extra={
-                "full_name": message.from_user.full_name,
-                "id": message.from_user.id,
-            },
+            "Пришел запрос карты %s",
+            message.from_user.full_name,
         )
         try:
             if config_bot.config_gymchana_cup["trackUrl"]:
