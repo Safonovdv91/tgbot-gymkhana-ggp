@@ -1,10 +1,10 @@
 import json
 import logging
+from datetime import datetime, timedelta
 
 import aiohttp
 
 from aio_bot import config_bot
-from datetime import datetime, timedelta
 
 API_GYMKHANA = config_bot.config_gymchana_cup["API"]
 SITE = config_bot.config_gymchana_cup["site"]
@@ -29,15 +29,14 @@ async def get_sportsmans_from_ggp_stage(site=SITE, api_gymkhana=API_GYMKHANA):
     except ConnectionError:
         logger.error("Пропало соединение с интернетом")
         return {}
-    if not status_code == 200:
+    if status_code != 200:
         logger.error("Server or API-key is invalid")
-        raise Exception(
-            "get_sportsmans_from_ggp_stage [Responce 500] API or Server invalid"
-        )
+        raise Exception("get_sportsmans_from_ggp_stage [Responce 500] API or Server invalid")
     resp_json = json.loads(get_api)
     championship_id = resp_json[0]["id"]
 
-    # взяв ID действующего чемпионата получаем его этапы и после проходим по ним пока не найдем действующий
+    # взяв ID действующего чемпионата получаем его этапы и после проходим
+    # по ним пока не найдем действующий
     async with aiohttp.ClientSession() as session:
         async with session.get(
             f"{site}/championships/get?signature={api_gymkhana}&id={championship_id}&type=gp"
@@ -56,8 +55,8 @@ async def get_sportsmans_from_ggp_stage(site=SITE, api_gymkhana=API_GYMKHANA):
         ):
             now_stage = stage
             start_stage_date = datetime.fromtimestamp(stage["dateStart"])
-            config_bot.config_gymchana_cup["end_bet_time"] = (
-                start_stage_date + timedelta(weeks=1)
+            config_bot.config_gymchana_cup["end_bet_time"] = start_stage_date + timedelta(
+                weeks=1, days=0, hours=3
             )
             async with aiohttp.ClientSession() as session:
                 async with session.get(
@@ -66,13 +65,13 @@ async def get_sportsmans_from_ggp_stage(site=SITE, api_gymkhana=API_GYMKHANA):
                     status_code = resp.status
                     get_api = await resp.text()
                     logger.debug(
-                        f"Получаем данные одного этапа:\n status: {status_code}"
+                        "Получаем данные одного этапа:\n status: %s",
+                        status_code,
                     )
                     if status_code == 200:
                         resp_json = json.loads(get_api)
-                        logger.debug(f"{resp_json["title"]} {resp_json["id"]}")
+                        logger.debug("%s %s", resp_json["title"], resp_json["id"])
 
-            # выставляем более частую проверку и выставляем id этапа ! ПОТОМ ВЫНЕСТИ В ДРУГУЮ ФУНКЦИЮ
             config_bot.config_gymchana_cup["GET_TIME_OUT"] = 60 * 5
             config_bot.config_gymchana_cup["id_stage_now"] = now_stage["id"]
             config_bot.config_gymchana_cup["trackUrl"] = now_stage["trackUrl"]
@@ -82,6 +81,7 @@ async def get_sportsmans_from_ggp_stage(site=SITE, api_gymkhana=API_GYMKHANA):
     logger.info("Сейчас нет приема результатов, устанавливаем повышенный таймаут")
     config_bot.config_gymchana_cup["trackUrl"] = None
     config_bot.config_gymchana_cup["GET_TIME_OUT"] = 60 * 60 * 3
-    logger.info(f"Таймаут = {config_bot.config_gymchana_cup['GET_TIME_OUT']}с")
+    logger.info("Таймаут = %sс", config_bot.config_gymchana_cup["GET_TIME_OUT"])
     config_bot.config_gymchana_cup["trackUrl"] = False
     config_bot.config_gymchana_cup["end_bet_time"] = datetime(2020, 1, 1, 1, 1)
+    return None

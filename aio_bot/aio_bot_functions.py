@@ -1,9 +1,11 @@
 import logging
-
 from dataclasses import dataclass
+from datetime import datetime
 from typing import Any
-from DB.db_obj import DbTgUsers, DbSubsAtheleteClass, DbBetTime
-from DB.models import TelegramUser, BetTimeTelegramUser
+
+from aio_bot import config_bot
+from DB.db_obj import DbBetTime, DbSubsAtheleteClass, DbTgUsers
+from DB.models import BetTimeTelegramUser, TelegramUser
 
 logger = logging.getLogger("app.app_func")
 
@@ -51,9 +53,7 @@ class BotFunction:
         minutes, milliseconds = divmod(milliseconds, 60_000)
         seconds, milliseconds = divmod(milliseconds, 1_000)
         # Форматирование в строку в формате "минуты:секунды.миллисекунды"
-        mmssms_format: str = "{:02d}:{:02d}.{:03d}".format(
-            minutes, seconds, milliseconds
-        )
+        mmssms_format: str = "{:02d}:{:02d}.{:03d}".format(minutes, seconds, milliseconds)
         return mmssms_format
 
     def make_calculate_text(self, best_time_ms: (int, float)):
@@ -73,14 +73,10 @@ class BotFunction:
     @staticmethod
     def find_closest_number(numbers, bet):
         closest_number = None
-        min_difference = float(
-            "inf"
-        )  # Инициализируем минимальную разницу как бесконечность
+        min_difference = float("inf")  # Инициализируем минимальную разницу как бесконечность
 
         for number in numbers:
-            difference = abs(
-                number - bet
-            )  # Вычисляем разницу между числом из списка и bet
+            difference = abs(number - bet)  # Вычисляем разницу между числом из списка и bet
             if difference < min_difference:
                 min_difference = difference
                 closest_number = number
@@ -95,9 +91,9 @@ class BotInterface:
             try:
                 DbSubsAtheleteClass().remove_subscriber(athelete_class, tg_user_id)
             except ValueError:
-                pass
-            except Exception as e:
-                logging.exception(f"BotInterface: {e}")
+                logging.exception("BotInterface")
+            except Exception:
+                logging.exception("BotInterface")
         DbTgUsers().remove_tg_subscriber(tg_user_id)
         logging.info("Deleting success")
 
@@ -125,11 +121,17 @@ class DoBet:
 
         if DbBetTime().add(bet_ss) is None:
             msg = "А всё, ставка уже принята"
-            msg = f"{msg}\n {DoBet.get_my_bet(message)}"
-            return msg
+            return f"{msg}\n {DoBet.get_my_bet(message)}"
         mmssmm = BotFunction.msec_to_mmssms(time_ms)
         msg = f"Ваша ставка {tg_user.full_name} на время принята: {mmssmm}"
         return msg
+
+    @staticmethod
+    def is_can_bet() -> bool:
+        date_end = config_bot.config_gymchana_cup["end_bet_time"]
+        if datetime.now() > date_end:
+            return False
+        return True
 
     @staticmethod
     def get_my_bet(message):
@@ -146,11 +148,7 @@ class DoBet:
         day = date.day
         h = date.hour
         m = date.minute
-        msg = (
-            f"Ваша ставка на лучшее время:\n"
-            f" {year}-{month:02d}-{day} {h}:{m} - {mmssmm}"
-        )
-        return msg
+        return f"Ваша ставка на лучшее время:\n" f" {year}-{month:02d}-{day} {h}:{m} - {mmssmm}"
 
 
 @dataclass()

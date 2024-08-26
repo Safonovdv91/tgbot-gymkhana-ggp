@@ -3,7 +3,18 @@ from datetime import datetime
 
 
 class StageSubscribers:
-    __athelete_classes = ("A", "B", "C1", "C2", "C3", "D1", "D2", "D3", "D4", "N")
+    __athelete_classes = (
+        "A",
+        "B",
+        "C1",
+        "C2",
+        "C3",
+        "D1",
+        "D2",
+        "D3",
+        "D4",
+        "N",
+    )
 
     def __init__(self, athelete_class: str, subscribers_id: set):
         self.athlete_class = athelete_class
@@ -79,15 +90,15 @@ class Subscriber:
 
 class StageSportsmanResult:
     __slots__ = (
+        "_fine",
+        "_result_time_seconds",
         "_sportsman_id",
-        "user_full_name",
+        "athlete_class",
         "motorcycle",
+        "result_time",
         "user_city",
         "user_country",
-        "athlete_class",
-        "_result_time_seconds",
-        "result_time",
-        "_fine",
+        "user_full_name",
         "video",
     )
 
@@ -171,6 +182,7 @@ class BetTimeTelegramUser:
     date_bet1: datetime = datetime.now()
     bet_time2: int = field(default=0)
     date_bet2: datetime = field(compare=False, default=datetime.now())
+    delta_bet_time1: None = None
 
     def __setattr__(self, name, value):
         if name == "bet_time1" and value < 0:

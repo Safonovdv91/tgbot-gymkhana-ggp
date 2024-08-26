@@ -1,7 +1,7 @@
 # Этап 1: Установка зависимостей с помощью poetry
 FROM python:3.12
 MAINTAINER SafonovDV
-LABEL version="1.0.0"
+LABEL version="1.0.2"
 # python:
 ENV PYTHONFAULTHANDLER=1 \
 PYTHONUNBUFFERED=1 \
