@@ -40,9 +40,10 @@ class BettingMessageSender:
         bet_users = await BettingMessageSender.sort_by_delta_time(bet_users)
         text = "Таблица ставок на время:\n"
         for i in range(len(bet_users)):
+            delta_time = BotFunction.msec_to_mmssms(bet_users[i].delta_bet_time1)
             text += (
                 f"\t{i + 1}) {bet_users[i].tg_user.username}"
                 f" - {BotFunction.msec_to_mmssms(bet_users[i].bet_time1)} "
-                f"[{bet_users[i].delta_bet_time1}мс]\n"
+                f"[{delta_time}]\n"
             )
         return text
