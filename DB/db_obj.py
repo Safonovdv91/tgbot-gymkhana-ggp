@@ -1,13 +1,13 @@
 import logging
 from dataclasses import asdict
 
-from pymongo import MongoClient
-from pymongo import errors
+from pymongo import MongoClient, errors
 from pymongo.results import DeleteResult
-from aio_bot import config_bot
-from DB.models import StageSportsmanResult, TelegramUser, BetTimeTelegramUser
 
-logger = logging.getLogger("app.DB.db_obj")
+from aio_bot import config_bot
+from DB.models import BetTimeTelegramUser, StageSportsmanResult, TelegramUser
+
+logger = logging.getLogger(__name__)
 
 
 class DbMongo:
@@ -22,7 +22,7 @@ class DbMongo:
         try:
             self.connection = MongoClient(self.ipaddress, self.port)
         except errors.ServerSelectionTimeoutError:
-            print("catch exeption")
+            logger.exception("Инициалищзация соединения")
             raise Exception("MongoDB is TimeOut")
 
     def close(self):
@@ -85,9 +85,14 @@ class DbStageResults(DbMongo):
     def __init__(self):
         super().__init__()
         self.current_db = self.connection[self.DB_NAME]
+        # todo убрать хардкод!
+        # self.collection = self.current_db[
+        #     f"stage_{config_bot.config_gymchana_cup['id_stage_now']}"
+        # ]
         self.collection = self.current_db[
-            f"stage_{config_bot.config_gymchana_cup['id_stage_now']}"
+            f"stage_37"
         ]
+
 
     def add(self, result: StageSportsmanResult):
         """
@@ -136,12 +141,10 @@ class DbStageResults(DbMongo):
             self.del_result(result["userId"])
         self.add(new_result)
 
-    def get_bestStage_time(self) -> int | None:
+    def get_best_stage_time(self) -> int | None:
         try:
             return (
-                self.collection.find()
-                .sort("resultTimeSeconds")
-                .limit(1)[0]["resultTimeSeconds"]
+                self.collection.find().sort("resultTimeSeconds").limit(1)[0]["resultTimeSeconds"]
             )
         except IndexError:
             return None
@@ -183,18 +186,14 @@ class DbSubsAtheleteClass(DbMongo):
         """Добавление нового подписчика"""
         if athelete_class not in self.ATHELETE_CLASSES:
             logger.error("DbSubsAtheleteClass: add_subscriber Вызван запрещенный ключ")
-            raise AttributeError(
-                "DbSubsAtheleteClass: add_subscriber Вызван запрещенный ключ"
-            )
+            raise AttributeError("DbSubsAtheleteClass: add_subscriber Вызван запрещенный ключ")
 
         if tg_id in self.get_subscriber(athelete_class):
             raise ValueError("Пользователь уже существует")
 
         try:
             if self.collection.find_one({"_id": athelete_class}) is None:
-                self.collection.insert_one(
-                    {"_id": athelete_class, "id_tg_users": [tg_id]}
-                )
+                self.collection.insert_one({"_id": athelete_class, "id_tg_users": [tg_id]})
             else:
                 self.collection.update_one(
                     {"_id": athelete_class}, {"$push": {"id_tg_users": tg_id}}
@@ -209,13 +208,9 @@ class DbSubsAtheleteClass(DbMongo):
     def remove_subscriber(self, athelete_class: str, tg_id: int) -> bool:
         """Отписка подписчика"""
         if tg_id not in self.get_subscriber(athelete_class):
-            raise ValueError(
-                f"Пользователь {tg_id} и так не подписан на {athelete_class}"
-            )
+            raise ValueError(f"Пользователь {tg_id} и так не подписан на {athelete_class}")
         try:
-            self.collection.update_one(
-                {"_id": athelete_class}, {"$pull": {"id_tg_users": tg_id}}
-            )
+            self.collection.update_one({"_id": athelete_class}, {"$pull": {"id_tg_users": tg_id}})
         except Exception as e:
             logger.exception(
                 f"DbSubsAtheleteClass: add_subscriber При УДАЛЕНИИ подписчика произошла ошибка:\n {e}"
@@ -230,15 +225,20 @@ class DbBetTime(DbMongo):
     def __init__(self):
         super().__init__()
         self.current_db = self.connection[self.DB_NAME]
-        self.collection = self.current_db[
-            f"bet_{config_bot.config_gymchana_cup['id_stage_now']}"
-        ]
+        # todo убрать хардкод!
+        # id_stage = config_bot.config_gymchana_cup["id_stage_now"]
+        id_stage = 37
+        self.collection = self.current_db[f"bet_{id_stage}"]
 
     def add(self, bet_object: BetTimeTelegramUser):
         """Добавление ставки в БД"""
         if self.get(bet_object.tg_user.tg_id) is None:
             logger.info(
-                f"Ставка user:{bet_object.tg_user.tg_id} на время {bet_object.bet_time1}"
+                "Добавляем ставку: %s[%s] на время: %s [%s]{bet_object.bet_time1}",
+                bet_object.tg_user.tg_id,
+                bet_object.tg_user.username,
+                bet_object.bet_time1,
+                bet_object.date_bet1,
             )
             self.collection.insert_one(asdict(bet_object))
             return True
@@ -248,8 +248,20 @@ class DbBetTime(DbMongo):
     def get(self, tg_id):
         if tg_id == "all":
             list_time = []
-            for each in self.collection.find():
-                list_time.append(each["bet_time1"])
+            for db_bet in self.collection.find():
+                user = TelegramUser(
+                    tg_id=db_bet["tg_user"]["tg_id"],
+                    username=db_bet["tg_user"]["username"],
+                    first_name=db_bet["tg_user"]["first_name"],
+                    full_name=db_bet["tg_user"]["full_name"],
+                    language_code=db_bet["tg_user"]["language_code"],
+                )
+                bet = BetTimeTelegramUser(
+                    tg_user=user,
+                    bet_time1=db_bet["bet_time1"],
+                    date_bet1=db_bet["date_bet1"],
+                )
+                list_time.append(bet)
             return list_time
         return self.collection.find_one({"tg_user.tg_id": tg_id})
 
@@ -262,14 +274,3 @@ class DbBetTime(DbMongo):
         ls = self.get("all")
         closest_time = BotFunction.find_closest_number(ls, bet_time1)
         return self.collection.find_one({"bet_time1": closest_time})
-
-
-def main():
-    client = DbTgUsers().get_all_subscribers()
-    for each in client:
-        if len(each["sub_stage_cat"]):
-            print(each["_id"])
-
-
-if __name__ == "__main__":
-    main()

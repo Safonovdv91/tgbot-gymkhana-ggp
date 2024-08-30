@@ -1,46 +1,39 @@
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
+from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
+
 from DB.db_obj import DbTgUsers
 
 btnBackToMenu = KeyboardButton(text="⬅ НАЗАД")
+# --- buttons GGP classes ---
+sub_a = KeyboardButton(text="🟥 🅰️")
+sub_b = KeyboardButton(text="🟦 🇧")
+sub_c1 = KeyboardButton(text="🟩 С1")
+sub_c2 = KeyboardButton(text="🟩 С2")
+sub_c3 = KeyboardButton(text="🟩 С3")
+sub_d1 = KeyboardButton(text="🟨 D1")
+sub_d2 = KeyboardButton(text="🟨 D2")
+sub_d3 = KeyboardButton(text="🟨 D3")
+sub_d4 = KeyboardButton(text="🟨 D4")
+
+unsub_a = KeyboardButton(text="🔲 🅰️")
+unsub_b = KeyboardButton(text="🔲 🇧")
+unsub_c1 = KeyboardButton(text="🔲 С1")
+unsub_c2 = KeyboardButton(text="🔲 С2")
+unsub_c3 = KeyboardButton(text="🔲 С3")
+unsub_d1 = KeyboardButton(text="🔲 D1")
+unsub_d2 = KeyboardButton(text="🔲 D2")
+unsub_d3 = KeyboardButton(text="🔲 D3")
+unsub_d4 = KeyboardButton(text="🔲 D4")
+
 
 # --- MAIN MENU ---
-btnStageMap = KeyboardButton(text="Получить 🗺 этапа")
-btnStageTime = KeyboardButton(text="Получить 🕗 этапа")
-btnSubscribe = KeyboardButton(text="Подписаться")
-btnSubscribeNews = KeyboardButton(text="Подписаться news")
-
-mainMenu = ReplyKeyboardMarkup(
-    resize_keyboard=True, keyboard=[[btnSubscribe, btnStageMap, btnStageTime]]
-)
-
-# --- Subscribe Menu ---
-sub_A = KeyboardButton(text="🟥 🅰️")
-sub_B = KeyboardButton(text="🟦 🇧")
-sub_C1 = KeyboardButton(text="🟩 С1")
-sub_C2 = KeyboardButton(text="🟩 С2")
-sub_C3 = KeyboardButton(text="🟩 С3")
-sub_D1 = KeyboardButton(text="🟨 D1")
-sub_D2 = KeyboardButton(text="🟨 D2")
-sub_D3 = KeyboardButton(text="🟨 D3")
-sub_D4 = KeyboardButton(text="🟨 D4")
-
-unsub_A = KeyboardButton(text="🔲 🅰️")
-unsub_B = KeyboardButton(text="🔲 🇧")
-unsub_C1 = KeyboardButton(text="🔲 С1")
-unsub_C2 = KeyboardButton(text="🔲 С2")
-unsub_C3 = KeyboardButton(text="🔲 С3")
-unsub_D1 = KeyboardButton(text="🔲 D1")
-unsub_D2 = KeyboardButton(text="🔲 D2")
-unsub_D3 = KeyboardButton(text="🔲 D3")
-unsub_D4 = KeyboardButton(text="🔲 D4")
-
-subscribeMenu = ReplyKeyboardMarkup(
+btn_stage_map = KeyboardButton(text="Получить 🗺 этапа")
+btn_stage_time = KeyboardButton(text="Получить 🕗 этапа")
+btn_subscribe = KeyboardButton(text="Подписаться")
+btn_subscribe_news = KeyboardButton(text="Подписаться news")
+btn_make_bet = KeyboardButton(text="⌚ Сделать ставку на лучшее время GGP")
+main_menu = ReplyKeyboardMarkup(
     resize_keyboard=True,
-    keyboard=[
-        [sub_A, unsub_B],
-        [unsub_C1, unsub_C2, sub_C3],
-        [sub_D1, sub_D2, sub_D3, sub_D4, btnBackToMenu],
-    ],
+    keyboard=[[btn_subscribe, btn_stage_map, btn_stage_time], [btn_make_bet]],
 )
 
 
@@ -49,27 +42,16 @@ class SubscriberMenu:
     def subscriber_menu_btn(tg_user_id):
         subs_ls = DbTgUsers().get_tg_subscriber(tg_user_id)
         subs_ls = [] if subs_ls is None else subs_ls["sub_stage_cat"]
-        A = sub_A if "A" in subs_ls else unsub_A
-        B = sub_B if "B" in subs_ls else unsub_B
-        C1 = sub_C1 if "C1" in subs_ls else unsub_C1
-        C2 = sub_C2 if "C2" in subs_ls else unsub_C2
-        C3 = sub_C3 if "C3" in subs_ls else unsub_C3
-        D1 = sub_D1 if "D1" in subs_ls else unsub_D1
-        D2 = sub_D2 if "D2" in subs_ls else unsub_D2
-        D3 = sub_D3 if "D3" in subs_ls else unsub_D3
-        D4 = sub_D4 if "D4" in subs_ls else unsub_D4
+        a = sub_a if "A" in subs_ls else unsub_a
+        b = sub_b if "B" in subs_ls else unsub_b
+        c1 = sub_c1 if "C1" in subs_ls else unsub_c1
+        c2 = sub_c2 if "C2" in subs_ls else unsub_c2
+        c3 = sub_c3 if "C3" in subs_ls else unsub_c3
+        d1 = sub_d1 if "D1" in subs_ls else unsub_d1
+        d2 = sub_d2 if "D2" in subs_ls else unsub_d2
+        d3 = sub_d3 if "D3" in subs_ls else unsub_d3
+        d4 = sub_d4 if "D4" in subs_ls else unsub_d4
         return ReplyKeyboardMarkup(
             resize_keyboard=True,
-            keyboard=[[A, B], [C1, C2, C3], [D1, D2, D3, D4], [btnBackToMenu]],
+            keyboard=[[a, b], [c1, c2, c3], [d1, d2, d3, d4], [btnBackToMenu]],
         )
-
-
-# --- Subscribe to news ---
-
-# btnSubscribeNews = InlineKeyboardMarkup(row_width=1)
-# btn1 = InlineKeyboardButton(text="🟢 Подписаться на мировой рекорд", callback_data="fx1")
-# btn2 = InlineKeyboardButton(text="🟢 Подписаться регистрацию этапа", callback_data="fx2")
-# btn3 = InlineKeyboardButton(text="🟠 ОТПИСАТЬСЯ от мирового рекорда", callback_data="fx3")
-# btn4 = InlineKeyboardButton(text="🟠 ОТПИСАТЬСЯ на регистрацию этапа", callback_data="fx4")
-#
-# btnSubscribeNews.add(btn1, btn2)
