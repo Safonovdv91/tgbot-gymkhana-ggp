@@ -44,6 +44,6 @@ class BettingMessageSender:
             text += (
                 f"\t{i + 1}) {bet_users[i].tg_user.username}"
                 f" - {BotFunction.msec_to_mmssms(bet_users[i].bet_time1)} "
-                f"[{delta_time}]\n"
+                f"[{delta_time}] | {bet_users[i].date_bet1.strftime("%Y-%m-%d %H:%M:%S")}\n"
             )
         return text

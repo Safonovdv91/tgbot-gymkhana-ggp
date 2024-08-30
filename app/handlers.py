@@ -146,9 +146,9 @@ async def make_bet(message: types.Message, state: FSMContext):
             bet_time1=db_bet["bet_time1"],
             date_bet1=db_bet["date_bet1"],
         )
-        nickname = f"Nickname: {bet.tg_user.username}"
-        bet_time = f"Bet time: {BotFunction.msec_to_mmssms(bet.bet_time1)}"
-        bet_date = f"Bet date: {bet.date_bet1}"
+        nickname = f"Nickname: {bet.tg_user.full_name}"
+        bet_time = f"Ставка на время: {BotFunction.msec_to_mmssms(bet.bet_time1)}"
+        bet_date = f"Дата: {bet.date_bet1.strftime("%Y-%m-%d %H:%M:%S")}"
         text = f"{nickname}\n{bet_time}\n{bet_date}"
         if not DoBet.is_can_bet():
             await message.answer(

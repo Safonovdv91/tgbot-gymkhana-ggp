@@ -47,9 +47,9 @@ async def betting_take_time(message: types.Message, state: FSMContext):
     await state.update_data(bet=bet)
     await state.set_state(BotStates.Get_betting_sure)
     await message.reply("Это верные данные?")
-    nickname = f"Nickname: {bet.tg_user.username}"
-    bet_time = f"Bet time: {BotFunction.msec_to_mmssms(bet.bet_time1)}"
-    bet_date = f"Bet date: {bet.date_bet1}"
+    nickname = f"Nickname: {bet.tg_user.full_name}"
+    bet_time = f"Время ставки: {BotFunction.msec_to_mmssms(bet.bet_time1)}"
+    bet_date = f"Дата ставки: {bet.date_bet1.strftime("%Y-%m-%d %H:%M:%S")}"
     await message.answer(
         text=f"{nickname}\n{bet_time}\n{bet_date}",
         reply_markup=ReplyKeyboardMarkup(
