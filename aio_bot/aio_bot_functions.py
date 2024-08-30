@@ -53,7 +53,9 @@ class BotFunction:
         minutes, milliseconds = divmod(milliseconds, 60_000)
         seconds, milliseconds = divmod(milliseconds, 1_000)
         # Форматирование в строку в формате "минуты:секунды.миллисекунды"
-        mmssms_format: str = "{:02d}:{:02d}.{:03d}".format(minutes, seconds, milliseconds)
+        if minutes == 0:
+            return "{:02d}.{:03d}".format(seconds, milliseconds)
+        mmssms_format: str = "{:02d}:{:02d}.{:02d}".format(minutes, seconds, milliseconds)
         return mmssms_format
 
     def make_calculate_text(self, best_time_ms: (int, float)):
