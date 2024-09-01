@@ -49,11 +49,14 @@ async def get_sportsmans_from_ggp_stage(site=SITE, api_gymkhana=API_GYMKHANA):
 
     stages = resp_json["stages"]
     for stage in stages:
-        if stage["status"] in (
+        now_stage = stage
+        if stage["status"] == "Прошедший этап":
+            config_bot.config_gymchana_cup["id_stage_last"] = now_stage["id"]
+
+        elif stage["status"] in (
             "Приём результатов",
             "Подведение итогов",
         ):
-            now_stage = stage
             start_stage_date = datetime.fromtimestamp(stage["dateStart"])
             config_bot.config_gymchana_cup["end_bet_time"] = start_stage_date + timedelta(
                 weeks=1, days=0, hours=3

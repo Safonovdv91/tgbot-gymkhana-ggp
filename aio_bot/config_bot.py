@@ -42,6 +42,8 @@ config_gymchana_cup = {
     "API": raw_config["gymkhana_cup"]["API"],
     "GET_TIME_OUT": raw_config["gymkhana_cup"]["GET_TIME_OUT"],
     "trackUrl": raw_config["gymkhana_cup"]["trackUrl"],
+    "id_stage_now": 30,
+    "id_stage_last": 30,
     "end_bet_time": None,
     "best_time": None
 }
