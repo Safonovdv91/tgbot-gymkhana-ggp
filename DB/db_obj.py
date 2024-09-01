@@ -86,13 +86,9 @@ class DbStageResults(DbMongo):
         super().__init__()
         self.current_db = self.connection[self.DB_NAME]
         # todo убрать хардкод!
-        # self.collection = self.current_db[
-        #     f"stage_{config_bot.config_gymchana_cup['id_stage_now']}"
-        # ]
         self.collection = self.current_db[
-            f"stage_37"
+            f"stage_{config_bot.config_gymchana_cup['id_stage_now']}"
         ]
-
 
     def add(self, result: StageSportsmanResult):
         """
@@ -226,8 +222,7 @@ class DbBetTime(DbMongo):
         super().__init__()
         self.current_db = self.connection[self.DB_NAME]
         # todo убрать хардкод!
-        # id_stage = config_bot.config_gymchana_cup["id_stage_now"]
-        id_stage = 37
+        id_stage = config_bot.config_gymchana_cup["id_stage_last"]
         self.collection = self.current_db[f"bet_{id_stage}"]
 
     def add(self, bet_object: BetTimeTelegramUser):
