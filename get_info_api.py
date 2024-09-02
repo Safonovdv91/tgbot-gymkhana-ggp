@@ -76,7 +76,7 @@ async def get_sportsmans_from_ggp_stage(site=SITE, api_gymkhana=API_GYMKHANA):
                         logger.debug("%s %s", resp_json["title"], resp_json["id"])
 
             config_bot.config_gymchana_cup["GET_TIME_OUT"] = 60 * 5
-            config_bot.config_gymchana_cup["id_stage_now"] = now_stage["id"]
+            config_bot.config_gymchana_cup["id_stage_now"] = None
             config_bot.config_gymchana_cup["trackUrl"] = now_stage["trackUrl"]
             return resp_json
 

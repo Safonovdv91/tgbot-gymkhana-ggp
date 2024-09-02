@@ -221,9 +221,15 @@ class DbBetTime(DbMongo):
     def __init__(self):
         super().__init__()
         self.current_db = self.connection[self.DB_NAME]
-        # todo убрать хардкод!
         id_stage = config_bot.config_gymchana_cup["id_stage_now"]
-        self.collection = self.current_db[f"bet_{id_stage}"]
+
+        if id_stage is None:
+            id_stage = config_bot.config_gymchana_cup["id_stage_last"]
+
+        try:
+            self.collection = self.current_db[f"bet_{id_stage}"]
+        except Exception as e:
+            logger.exception("При подключении к коллекции произошла ошибка: %s" % e)
 
     def add(self, bet_object: BetTimeTelegramUser):
         """Добавление ставки в БД"""
