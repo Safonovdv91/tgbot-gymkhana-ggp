@@ -222,7 +222,7 @@ class DbBetTime(DbMongo):
         super().__init__()
         self.current_db = self.connection[self.DB_NAME]
         # todo убрать хардкод!
-        id_stage = config_bot.config_gymchana_cup["id_stage_last"]
+        id_stage = config_bot.config_gymchana_cup["id_stage"]
         self.collection = self.current_db[f"bet_{id_stage}"]
 
     def add(self, bet_object: BetTimeTelegramUser):
