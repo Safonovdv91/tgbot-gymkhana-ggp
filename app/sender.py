@@ -16,7 +16,6 @@ class BotMessageSender:
     async def send_msg(self, user_id: int, message: str, nav_menu=nav.main_menu):
         logger.info("Высылаем сообщение ID[%s]\n %s", user_id, message)
         try:
-            await asyncio.sleep(10)
             await self.bot.send_message(chat_id=user_id, text=message, reply_markup=nav_menu)
         except exceptions.TelegramForbiddenError:
             logger.warning("Пользователь %s заблокировал бота", user_id)
