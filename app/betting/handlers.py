@@ -10,7 +10,7 @@ from aio_bot.aio_bot_functions import BotFunction
 from aio_bot.aio_markups import btnBackToMenu
 from app.betting.sender import BettingMessageSender
 from app.bot_states import BotStates
-from app.handlers import BotMessageSender
+from app.sender import BotMessageSender
 from DB.db_obj import DbBetTime
 from DB.models import BetTimeTelegramUser, TelegramUser
 

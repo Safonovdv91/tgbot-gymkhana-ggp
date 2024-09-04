@@ -11,6 +11,7 @@ from aio_bot.aio_markups import btnBackToMenu
 from app.betting.sender import BettingMessageSender
 from app.bot_states import BotStates
 from app.constants import BAD_MESSAGE, HELP_MESSAGE, START_MESSAGE
+from app.sender import BotMessageSender
 from DB import database as DBM
 from DB.db_obj import DbBetTime, DbStageResults, DbTgUsers
 from DB.models import BetTimeTelegramUser, TelegramUser
@@ -310,25 +311,3 @@ async def get_time_stage(message: types.Message):
                 BAD_MESSAGE,
                 reply_markup=nav.main_menu,
             )
-
-
-class BotMessageSender:
-    def __init__(self):
-        self.API_bot = config_bot.config["API_token"]
-        self.bot = Bot(token=self.API_bot)
-
-    async def send_msg(self, user_id: int, message: str, nav_menu=nav.main_menu):
-        logger.info("Высылаем сообщение %s / %s", user_id, message)
-        try:
-            await self.bot.send_message(chat_id=user_id, text=message, reply_markup=nav_menu)
-        except Exception:
-            logger.exception("Ошибка при массовой рассылке сообщений")
-        await self.close()
-
-    async def broadcast_msg(self, users_id: list[int], message: str):
-        for user_id in users_id:
-            await self.send_msg(user_id, message)
-
-    async def close(self):
-        logger.debug("Закрываем содинение сессии aiogram")
-        await self.bot.session.close()
