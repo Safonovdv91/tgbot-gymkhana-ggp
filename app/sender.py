@@ -3,7 +3,7 @@ import logging
 
 from aiogram import Bot, exceptions
 
-from aio_bot import aio_bot_functions, aio_markups as nav, config_bot
+from aio_bot import aio_markups as nav, config_bot
 
 logger = logging.getLogger(__name__)
 
@@ -14,7 +14,7 @@ class BotMessageSender:
         self.bot = Bot(token=self.API_bot)
 
     async def send_msg(self, user_id: int, message: str, nav_menu=nav.main_menu):
-        logger.info("Высылаем сообщение %s / %s", user_id, message)
+        logger.info("Высылаем сообщение ID[%s]\n %s", user_id, message)
         try:
             await asyncio.sleep(10)
             await self.bot.send_message(chat_id=user_id, text=message, reply_markup=nav_menu)
@@ -23,7 +23,7 @@ class BotMessageSender:
         except exceptions.TelegramBadRequest:
             logger.warning("Пользователь %s удалил бота", user_id)
         except exceptions.TelegramNotFound:
-            logger.error(f"Target [ID:{user_id}]: invalid user ID")
+            logger.error("Target [ID:%s}]: invalid user ID", user_id)
         except exceptions.TelegramRetryAfter as e:
             logger.warning(
                 "Сработала антиспам защита, потовряем запрос через %s секунд", e.retry_after
