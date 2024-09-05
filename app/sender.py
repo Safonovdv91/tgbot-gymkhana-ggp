@@ -18,9 +18,9 @@ class BotMessageSender:
         try:
             await self.bot.send_message(chat_id=user_id, text=message, reply_markup=nav_menu)
         except exceptions.TelegramForbiddenError:
-            logger.warning("Пользователь %s заблокировал бота", user_id)
+            logger.warning("Пользователь [ID:%s] заблокировал бота", user_id)
         except exceptions.TelegramBadRequest:
-            logger.warning("Пользователь %s удалил бота", user_id)
+            logger.warning("Пользователь [ID:%s] удалил бота", user_id)
         except exceptions.TelegramNotFound:
             logger.error("Target [ID:%s}]: invalid user ID", user_id)
         except exceptions.TelegramRetryAfter as e:
