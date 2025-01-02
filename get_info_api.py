@@ -33,6 +33,17 @@ async def get_sportsmans_from_ggp_stage(site=SITE, api_gymkhana=API_GYMKHANA):
         logger.error("Server or API-key is invalid")
         raise Exception("get_sportsmans_from_ggp_stage [Responce 500] API or Server invalid")
     resp_json = json.loads(get_api)
+    if len(resp_json) == 0:
+        # задержка проверки результатов бота в секундах
+        logger.info("Сейчас нет приема результатов, устанавливаем повышенный таймаут")
+        config_bot.config_gymchana_cup["trackUrl"] = None
+        config_bot.config_gymchana_cup["id_stage_now"] = None
+        config_bot.config_gymchana_cup["GET_TIME_OUT"] = 60 * 60 * 3
+        logger.info("Таймаут = %sс", config_bot.config_gymchana_cup["GET_TIME_OUT"])
+        config_bot.config_gymchana_cup["trackUrl"] = False
+        config_bot.config_gymchana_cup["end_bet_time"] = datetime(2020, 1, 1, 1, 1)
+        return None
+
     championship_id = resp_json[0]["id"]
 
     # взяв ID действующего чемпионата получаем его этапы и после проходим
