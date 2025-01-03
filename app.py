@@ -8,6 +8,7 @@ from aio_bot import config_bot
 from aio_bot.aio_bot_functions import BotInterface
 from app.betting.handlers import router as bet_router
 from app.handlers import router
+from app.sender import BotMessageSender
 from DB import database as DBM
 from DB.db_obj import DbStageResults, DbSubsAtheleteClass
 from DB.models import StageSportsmanResult
@@ -101,7 +102,7 @@ async def scheduled():
 
                     for tg_client in tg_clients:
                         try:
-                            await bot.send_message(tg_client, msg_text, disable_notification=True)
+                            await BotMessageSender().send_msg(tg_client, msg_text)
 
                         except exceptions.TelegramBadRequest:
                             """ Бот заблокирован, значит удаляем из подписок"""

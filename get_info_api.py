@@ -16,7 +16,6 @@ async def get_sportsmans_from_ggp_stage(site=SITE, api_gymkhana=API_GYMKHANA):
     """Функция получения данных спортсменов участвующих в действующем этапе
     и возвращающая списка всех спортсменов с использованием GET API
     """
-    # получаем действующий ЧЕМПИОНАТ
     try:
         async with aiohttp.ClientSession() as session:
             async with session.get(
@@ -26,17 +25,24 @@ async def get_sportsmans_from_ggp_stage(site=SITE, api_gymkhana=API_GYMKHANA):
                 status_code = resp.status
                 get_api = await resp.text()
                 logger.debug("Получаем чампионаты:\n status: %s", status_code)
+
     except ConnectionError:
         logger.error("Пропало соединение с интернетом")
         return {}
+
     if status_code != 200:
         logger.error("Server or API-key is invalid")
         raise Exception("get_sportsmans_from_ggp_stage [Responce 500] API or Server invalid")
-    resp_json = json.loads(get_api)
-    championship_id = resp_json[0]["id"]
 
-    # взяв ID действующего чемпионата получаем его этапы и после проходим
-    # по ним пока не найдем действующий
+    resp_json = json.loads(get_api)
+    if len(resp_json) == 0:
+        # задержка проверки результатов бота в секундах
+        logger.info("Пришел пустой ответ от API")
+        await set_config_delay()
+        await set_config_none_status()
+        return None
+
+    championship_id = resp_json[0]["id"]
     async with aiohttp.ClientSession() as session:
         async with session.get(
             f"{site}/championships/get?signature={api_gymkhana}&id={championship_id}&type=gp"
@@ -61,6 +67,7 @@ async def get_sportsmans_from_ggp_stage(site=SITE, api_gymkhana=API_GYMKHANA):
             config_bot.config_gymchana_cup["end_bet_time"] = start_stage_date + timedelta(
                 weeks=1, days=0, hours=3
             )
+
             async with aiohttp.ClientSession() as session:
                 async with session.get(
                     f"{site}/stages/get?signature={api_gymkhana}&id={now_stage['id']}&type=gp"
@@ -81,11 +88,21 @@ async def get_sportsmans_from_ggp_stage(site=SITE, api_gymkhana=API_GYMKHANA):
             return resp_json
 
     # задержка проверки результатов бота в секундах
-    logger.info("Сейчас нет приема результатов, устанавливаем повышенный таймаут")
+    await set_config_delay(60 * 60 * 3)
+    await set_config_none_status()
+    return None
+
+async def set_config_delay(delay_time : int = 60):
+    """Функция установки задержки проверки результатов бота в секундах
+    """
+    logger.info("Устанавливаем задержку проверки результатов бота в секундах: = %s с", delay_time)
+    config_bot.config_gymchana_cup["GET_TIME_OUT"] = 60 * 60 * 3
+    logger.info("Таймаут = %s с", config_bot.config_gymchana_cup["GET_TIME_OUT"])
+
+
+async def set_config_none_status():
+    logger.info("Устанавливаем начальные данные, все NONE")
     config_bot.config_gymchana_cup["trackUrl"] = None
     config_bot.config_gymchana_cup["id_stage_now"] = None
-    config_bot.config_gymchana_cup["GET_TIME_OUT"] = 60 * 60 * 3
-    logger.info("Таймаут = %sс", config_bot.config_gymchana_cup["GET_TIME_OUT"])
     config_bot.config_gymchana_cup["trackUrl"] = False
     config_bot.config_gymchana_cup["end_bet_time"] = datetime(2020, 1, 1, 1, 1)
-    return None
