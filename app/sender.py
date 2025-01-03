@@ -14,7 +14,7 @@ class BotMessageSender:
         self.bot = Bot(token=self.API_bot)
 
     async def send_msg(self, user_id: int, message: str, nav_menu=nav.main_menu):
-        logger.info("Высылаем сообщение ID[%s]\n %s", user_id, message)
+        logger.info("Высылаем сообщение ID[%s]\n", user_id)
         try:
             await self.bot.send_message(chat_id=user_id, text=message, reply_markup=nav_menu)
         except exceptions.TelegramForbiddenError:
